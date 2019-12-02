@@ -10,5 +10,5 @@ solveB :: undefined
 solveB = undefined
 
 main = do
-  contents <- readFile "data/"
+  contents <- readFile "../data/"
   print 10

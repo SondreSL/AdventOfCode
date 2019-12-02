@@ -29,11 +29,10 @@ def solveB(data):
             new[1] = i
             new[2] = j
             if compute(new) == 19690720:
-                print(f'{i} {j}')
                 return 100 * i + j
 
 def main():
-    data = read_file("data/input-2019-2.txt")
+    data = read_file("../data/input-2019-2.txt")
     print('Part A: ', solveA(data[:]))
     print('Part B: ', solveB(data))
 
