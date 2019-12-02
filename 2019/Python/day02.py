@@ -1,4 +1,6 @@
 import re
+from operator import mul
+from operator import add
 
 def read_file(filename):
     with open(filename) as f:
@@ -7,28 +9,17 @@ def read_file(filename):
 def compute(data):
     index = 0
     while data[index] != 99:
-        if data[index] == 1:
-            data[data[index + 3]] = data[data[index + 1]] + data[data[index + 2]]
-        elif data[index] == 2:
-            data[data[index + 3]] = data[data[index + 1]] * data[data[index + 2]]
-        else:
-            print("Bad opcode")
-            exit(1)
+        data[data[index + 3]] = {1: add, 2: mul}[data[index]](data[data[index + 1]], data[data[index + 2]])
         index += 4
     return data[0]
 
 def solveA(data):
-    data[1] = 12
-    data[2] = 2
-    return compute(data)
+    return compute(data[:1] + [12, 2] + data[3:])
 
 def solveB(data):
     for i in range(0, 100):
         for j in range(0, 100):
-            new = data[:]
-            new[1] = i
-            new[2] = j
-            if compute(new) == 19690720:
+            if compute(data[:1] + [i, j] + data[3:]) == 19690720:
                 return 100 * i + j
 
 def main():
