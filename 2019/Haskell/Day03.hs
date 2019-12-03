@@ -1,7 +1,7 @@
 import Prelude hiding (foldr)
 import Data.List hiding (insert, foldr)
 import Control.Arrow  ((&&&))
-import Data.Map (insert, member, empty, intersection, intersectionWith, foldr, foldrWithKey, Map)
+import Data.Map (insertWith, insert, member, empty, intersection, intersectionWith, foldr, foldrWithKey, Map)
 
 type Vals = Map (Int, Int) Int
 
@@ -17,18 +17,14 @@ compute input = go 1 (0, 0) (empty) input
         go len (x, y) values (('D', n):xs) = go (len+1) (x, y-1) (maybeInsert (x, y-1) len values) (('D', (n-1)):xs)
         go len (x, y) values (('L', n):xs) = go (len+1) (x+1, y) (maybeInsert (x+1, y) len values) (('L', (n-1)):xs)
         go len (x, y) values (('R', n):xs) = go (len+1) (x-1, y) (maybeInsert (x-1, y) len values) (('R', (n-1)):xs)
-
-maybeInsert :: (Int, Int) -> Int -> Vals -> Vals
-maybeInsert pos len m
-  | member pos m = m
-  | otherwise = (insert pos len m)
+        maybeInsert = insertWith const
 
 solveA :: Vals -> Vals -> Int
-solveA  = (foldrWithKey (const . min . manDist) (maxBound::Int) .) . (intersection)
+solveA = (foldrWithKey (const . min . manDist) (maxBound::Int) .) . intersection
   where manDist (a, b) = abs a + abs b
 
 solveB :: Vals -> Vals -> Int
-solveB = (foldr min (maxBound::Int) .) . intersectionWith (+)
+solveB = (minimum .) . intersectionWith (+)
 
 main = do
   (a:b:_) <- map compute . strToData <$> readFile "data/input-2019-3.txt"
