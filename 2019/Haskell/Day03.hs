@@ -1,16 +1,16 @@
-import Data.List
-import Data.Maybe
+import Prelude hiding (foldr)
+import Data.List hiding (insert, foldr)
 import Control.Arrow  ((&&&))
-import qualified Data.Map as M
+import Data.Map (insert, member, empty, intersection, intersectionWith, foldr, foldrWithKey, Map)
 
-type Vals = M.Map (Int, Int) Int
+type Vals = Map (Int, Int) Int
 
 strToData :: String -> [[(Char, Int)]]
 strToData = map (map f . words) . lines
   where f = head &&& read . tail
 
-compute :: [(Char, Int)] -> M.Map (Int, Int) Int
-compute input = go 1 (0, 0) (M.empty) input 
+compute :: [(Char, Int)] -> Vals
+compute input = go 1 (0, 0) (empty) input 
   where go len (x, y) values [] = values
         go len (x, y) values ((_, 0):xs) = go len (x, y) values xs
         go len (x, y) values (('U', n):xs) = go (len+1) (x, y+1) (maybeInsert (x, y+1) len values) (('U', (n-1)):xs)
@@ -20,26 +20,20 @@ compute input = go 1 (0, 0) (M.empty) input
 
 maybeInsert :: (Int, Int) -> Int -> Vals -> Vals
 maybeInsert pos len m
-  | M.member pos m = m
-  | otherwise = (M.insert pos len m)
+  | member pos m = m
+  | otherwise = (insert pos len m)
 
 solveA :: Vals -> Vals -> Int
-solveA a b =
-  let interKeys = M.intersection a b
-      manhatten = M.mapKeys (\(a, b) -> abs (0 - a) + abs (0 - b)) interKeys
-   in fst $ M.findMin manhatten
+solveA  = (foldrWithKey (const . min . manDist) (maxBound::Int) .) . (intersection)
+  where manDist (a, b) = abs a + abs b
 
 solveB :: Vals -> Vals -> Int
-solveB a b =
-  let interKeys = M.intersection a b
-      f pos len (p,l) = if len < l then (pos, len) else (p, l)
-      (k, minDist) = M.foldrWithKey f ((0,0), maxBound::Int) interKeys
-   in fromJust $ (+) <$> M.lookup k a <*> M.lookup k b
-   -- This is definitely not sound, but it does work
-   -- Assumes the shortest distance in left map is part of the solution
+solveB = (foldr min (maxBound::Int) .) . intersectionWith (+)
 
 main = do
-  contents <- strToData <$> readFile "data/input-2019-3.txt"
-  (a:b:_) <- pure . map compute $ contents
+  (a:b:_) <- map compute . strToData <$> readFile "data/input-2019-3.txt"
   print $ solveA a b
   print $ solveB a b
+
+-- Part A: 209
+-- Part B: 43258
