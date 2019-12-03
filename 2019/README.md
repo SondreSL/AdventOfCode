@@ -4,3 +4,4 @@
 
 - [Day 1](https://adventofcode.com/2019/day/1): The Tyranny of the Rocket Equation [[Haskell](Haskell/Day01.hs)]
 - [Day 2](https://adventofcode.com/2019/day/2): 1202 Program Alarm [[Haskell](Haskell/Day02.hs)][[Python](Python/day02.py)]
+- [Day 3](https://adventofcode.com/2019/day/3): Crossed Wires [[Haskell](Haskell/Day03.hs)][[Python](Python/day03.py)]
