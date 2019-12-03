@@ -20,7 +20,7 @@ class Point:
         return (self.x, self.y) == (other.x, other.y)
 
 def man_dist(point):
-    return abs(0 - point.x) + abs(0 - point.y)
+    return abs(point.x) + abs(point.y)
 
 def points_visited(path):
     start = (0, 0, 0)
@@ -42,26 +42,23 @@ def move(pos, direction, count):
     return pos, frozenset(rv)
 
 def compute(data):
-    path1 = points_visited(data[0])
-    path2 = points_visited(data[1])
-    return path1, path2
+    return points_visited(data[0]), points_visited(data[1])
 
-def solveA(data):
-    path1, path2 = compute(data)
+def solveA(path1, path2):
     return min(map(man_dist, path1.intersection(path2)))
 
-def solveB(data):
-    path1, path2 = compute(data)
+def solveB(path1, path2):
     inter = path1.intersection(path2)
     path1 = {i for i in path1 if i in inter}
     path2 = {i for i in path2 if i in inter}
-    return min(set(i.length + j.length for i in path1 for j in path2 if i == j))
+    return min(i.length + j.length for i in path1 for j in path2 if i == j)
 
 
 def main():
     data = read_file('data/input-2019-3.txt')
-    print('Part A:', solveA(data))
-    print('Part B:', solveB(data))
+    path1, path2 = compute(data)
+    print('Part A:', solveA(path1, path2))
+    print('Part B:', solveB(path1, path2))
 
 if __name__ == "__main__":
     main()
