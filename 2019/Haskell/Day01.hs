@@ -16,7 +16,7 @@ solve2 = sum . map calcFuelFuel
 
 main :: IO ()
 main = do
-  contents <- strToInts <$> readFile "../data/input-2019-1.txt"
+  contents <- strToInts <$> readFile "data/input-2019-1.txt"
   print $ solve contents
   print $ solve2 contents
 

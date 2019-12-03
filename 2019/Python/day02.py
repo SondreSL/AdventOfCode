@@ -23,7 +23,7 @@ def solveB(data):
                 return 100 * i + j
 
 def main():
-    data = read_file("../data/input-2019-2.txt")
+    data = read_file("data/input-2019-2.txt")
     print('Part A: ', solveA(data[:]))
     print('Part B: ', solveB(data))
 

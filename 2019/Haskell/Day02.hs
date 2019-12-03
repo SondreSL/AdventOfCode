@@ -30,6 +30,6 @@ solveB vec =
    in 100 * a + b
 
 main = do
-  contents <- strToInts <$> readFile "../data/input-2019-2.txt"
+  contents <- strToInts <$> readFile "data/input-2019-2.txt"
   print $ solveA contents
   print $ solveB contents
