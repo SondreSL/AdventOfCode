@@ -21,13 +21,9 @@ type Memory = Vector Int
 
 args :: Int -> Memory -> (Int, Int, Int)
 args i vec = 
-  let inst = vec ! i
-      mode x = (== 0) . (`rem` 10) . div inst $ x
-      y = (`rem` 10) . div inst $ 1000
-      a = bool (vec ! (i + 1)) (vec !! (i + 1)) (mode 100)
-      b = bool (vec ! (i + 2)) (vec !! (i + 2)) (mode 1000)
-      c = vec ! (i + 3)
-   in (a, b, c)
+  let mode x = (== 0) . (`rem` 10) . div (vec ! i) $ x
+      f x v = bool (!) (!!) (mode (100*(10^(x-1)))) vec (i + x)
+   in (f 1 vec, f 2 vec, vec ! (i + 3))
       
 compute :: Int -> [Int] -> [Int] -> Memory -> (Int, [Int])
 compute i input out vec =
