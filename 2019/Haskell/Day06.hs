@@ -44,8 +44,10 @@ subtree m a b curr = toSum $ Map.lookup curr m
 solveA :: Orbits -> Int
 solveA m = cntOrbits m 0 "COM"
 
-solveB :: Orbits -> Sum
-solveB m = subtree m "YOU" "SAN" "COM"
+solveB :: Orbits -> Int
+solveB m = case subtree m "YOU" "SAN" "COM" of
+             (Combined ans) -> ans
+             Null -> error "Invalid tree or input"
 
 main = do
   orbits <- parser <$> readFile "data/input-2019-6.txt"
