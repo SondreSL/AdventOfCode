@@ -7,3 +7,4 @@
 - [Day 3](https://adventofcode.com/2019/day/3): Crossed Wires [[Haskell](Haskell/Day03.hs)][[Python](Python/day03.py)]
 - [Day 4](https://adventofcode.com/2019/day/4): Secure Container [[Haskell](Haskell/Day04.hs)]
 - [Day 5](https://adventofcode.com/2019/day/5): Sunny with a Chance of Asteroids [[Haskell](Haskell/Day05.hs)]
+- [Day 6](https://adventofcode.com/2019/day/6): Universal Orbit Map [[Haskell](Haskell/Day06.hs)]
