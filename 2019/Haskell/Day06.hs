@@ -32,14 +32,13 @@ cntOrbits :: Orbits -> Int -> String -> Int
 cntOrbits orbits n str = n + (sum $ map (cntOrbits orbits (n + 1)) $ Map.findWithDefault [] str orbits)
 
 subtree :: Orbits -> String -> String -> String -> Sum
-subtree m a b curr =
-  let branches = case Map.lookup curr m of 
-                   Nothing -> Null
-                   Just xs | elem a xs -> Single 0
-                           | elem b xs -> Single 0
-                           | otherwise -> foldMap (subtree m a b) xs
-   in step $ branches
-  where step (Single a) = Single (a + 1)  
+subtree m a b curr = toSum $ Map.lookup curr m
+  where toSum Nothing = Null
+        toSum (Just xs) 
+          | elem a xs && elem b xs = Combined 0 
+          | elem a xs || elem b xs = Single 0 
+          | otherwise = foldMap (step . subtree m a b) xs 
+        step (Single a) = Single (a + 1)  
         step a = a
 
 solveA :: Orbits -> Int
@@ -51,6 +50,7 @@ solveB m = subtree m "YOU" "SAN" "COM"
 main = do
   orbits <- parser <$> readFile "data/input-2019-6.txt"
   print $ solveA orbits
+  print $ solveB $ parser "COM)B\nB)YOU\nB)SAN"
   print $ solveB orbits
 
 -- 295936
