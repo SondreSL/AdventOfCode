@@ -25,17 +25,20 @@ instance Semigroup Sum where
   Combined a <> Null = Combined a
   Null <> Combined a = Combined a
 
+instance Monoid Sum where
+  mempty = Null
+
 cntOrbits :: Orbits -> Int -> String -> Int
-cntOrbits orbits n str = n + (sum $ map (cntOrbits orbits (n + 1)) (fromMaybe [] $ Map.lookup str orbits))
+cntOrbits orbits n str = n + (sum $ map (cntOrbits orbits (n + 1)) $ Map.findWithDefault [] str orbits)
 
 subtree :: Orbits -> String -> String -> String -> Sum
 subtree m a b curr =
   let branches = case Map.lookup curr m of 
-                   Nothing -> [Null]
-                   Just xs | elem a xs -> [Single 0]
-                           | elem b xs -> [Single 0]
-                           | otherwise -> map (subtree m a b) xs
-   in step $ foldr (<>) Null branches
+                   Nothing -> Null
+                   Just xs | elem a xs -> Single 0
+                           | elem b xs -> Single 0
+                           | otherwise -> foldMap (subtree m a b) xs
+   in step $ branches
   where step (Single a) = Single (a + 1)  
         step a = a
 
