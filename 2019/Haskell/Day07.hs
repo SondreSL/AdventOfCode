@@ -41,14 +41,21 @@ compute i input memory =
         99 -> []
         i -> error ("Invalid opcode: " ++ show i)
 
--- https://github.com/bblum/aoc/blob/master/day07/Day07-lazy.hs
+-- -- https://github.com/bblum/aoc/blob/master/day07/Day07-lazy.hs
+-- run :: Memory -> [Int] -> Int
+-- run memory [a, b, c, d, e] = 
+--   let aa = compute 0 (a:0:ee) memory
+--       bb = compute 0 (b:aa) memory
+--       cc = compute 0 (c:bb) memory
+--       dd = compute 0 (d:cc) memory
+--       ee = compute 0 (e:dd) memory
+--    in last ee
+
 run :: Memory -> [Int] -> Int
-run memory [a, b, c, d, e] = 
-  let aa = compute 0 (a:0:ee) memory
-      bb = compute 0 (b:aa) memory
-      cc = compute 0 (c:bb) memory
-      dd = compute 0 (d:cc) memory
-      ee = compute 0 (e:dd) memory
+run memory (x:xs) =
+  let f a b = compute 0 (a:b) memory
+      aa = compute 0 (x:0:ee) memory
+      ee = foldr f aa xs
    in last ee
 
 solveA :: Memory -> Int
