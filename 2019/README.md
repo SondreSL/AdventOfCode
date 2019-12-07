@@ -8,3 +8,4 @@
 - [Day 4](https://adventofcode.com/2019/day/4): Secure Container [[Haskell](Haskell/Day04.hs)]
 - [Day 5](https://adventofcode.com/2019/day/5): Sunny with a Chance of Asteroids [[Haskell](Haskell/Day05.hs)]
 - [Day 6](https://adventofcode.com/2019/day/6): Universal Orbit Map [[Haskell](Haskell/Day06.hs)]
+- [Day 7](https://adventofcode.com/2019/day/7): Amplification Circuit [[Haskell](Haskell/Day07.hs)]

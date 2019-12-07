@@ -1,11 +1,9 @@
 import Prelude hiding ((!!))
 import Data.List hiding ((!!))
-import Data.Bits
 import Data.Char
 import Data.Vector (Vector, (//), (!), fromList) -- Sequence might be a better option
 import Data.Bool
 import Text.ParserCombinators.Parsec
-import Debug.Trace
 
 -- Parsing the input (comma separated ints)
 parser :: String -> Vector Int
@@ -50,29 +48,26 @@ untilHalt :: ProgramState -> Int
 untilHalt (Halt a (x:xs)) = x
 untilHalt (Wait ip input output mem) = untilHalt $ compute ip input output mem
 
-run :: Memory -> [Int] -> Int
-run m [a,b] = untilHalt (Wait 0 [a,b] [] m)
-run m (a:b:c:xs) = let next = untilHalt (Wait 0 [a,b] [] m)
-                    in run m (c:next:xs)
-
 newInput :: Int -> ProgramState -> ProgramState
 newInput i (Wait ip input output m) = Wait ip (input ++ [i]) output m
 
-runLoop :: [ProgramState] -> Int
-runLoop [last] = untilHalt last
-runLoop (Wait ip input output m:p:ps) = 
+run :: [ProgramState] -> Int
+run [last] = untilHalt last
+run (Wait ip input output m:p:ps) = 
   case compute ip input output m of
-    Halt _ (next:_) -> runLoop (newInput next p : ps)
-    new@(Wait ip' input' (a:output') m') -> runLoop ((newInput a p : ps) ++ [new])
+    Halt _ (next:_) -> run (newInput next p : ps)
+    new@(Wait ip' input' (a:output') m') -> run ((newInput a p : ps) ++ [new])
+
+initialStates :: Int -> Int -> Memory -> [[ProgramState]]
+initialStates from to input = 
+  let s = map (zipWith (flip newInput) (replicate 5 (Wait 0 [] [] input))) $ permutations [from..to]
+   in map (\(Wait ip [a] o m:xs) -> (Wait ip [a,0] o m : xs)) s
 
 solveA :: Memory -> Int
-solveA input = let xs = permutations [0,1,2,3,4]
-                in maximum $ map (run input) (map (\(x:xs) -> (x:0:xs)) xs)
+solveA = maximum . map run . initialStates 0 4
 
 solveB :: Memory -> Int
-solveB input = let ss = map (zipWith (flip newInput) (replicate 5 (Wait 0 [] [] input))) $ permutations [5,6,7,8,9]
-                   starts = map (\(Wait ip [a] o m:xs) -> (Wait ip [a,0] o m : xs)) ss
-                in maximum $ map runLoop starts
+solveB = maximum . map run . initialStates 5 9
     
 main = do
   contents <- parser <$> readFile "data/input-2019-7.txt"
