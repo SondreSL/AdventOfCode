@@ -41,6 +41,7 @@ compute i input memory =
         99 -> []
         i -> error ("Invalid opcode: " ++ show i)
 
+-- https://github.com/bblum/aoc/blob/master/day07/Day07-lazy.hs
 run :: Memory -> [Int] -> Int
 run memory [a, b, c, d, e] = 
   let aa = compute 0 (a:0:ee) memory
