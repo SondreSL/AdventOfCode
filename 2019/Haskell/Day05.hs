@@ -3,49 +3,51 @@ import Data.List hiding ((!!))
 import Data.Bits
 import Data.Char
 import Data.Vector (Vector, (//), (!), fromList) -- Sequence might be a better option
+import qualified Data.Sequence as S
+import Data.Sequence (Seq, index)
 import Data.Bool
 import Text.ParserCombinators.Parsec
 
 -- Parsing the input (comma separated ints)
-parser :: String -> Vector Int
-parser = either (error "Bad parse") fromList . parse numbers "Opcodes"
+parser :: String -> Seq Int
+parser = either (error "Bad parse") S.fromList . parse numbers "Opcodes"
   where numbers = map read <$> sepBy (minus <|> num) (char ',') 
         num = many1 digit 
         minus = (:) <$> char '-' <*> num
 
 -- Logic
-type Memory = Vector Int
+type Memory = Seq Int
 
-(!!) :: Memory -> Int -> Int
-(!!) vec i = vec ! (vec ! i)
+(!!!) :: Memory -> Int -> Int
+(!!!) mem i = index mem (index mem i)
 
 args :: Int -> Memory -> (Int, Int, Int)
 args i vec = 
-  let mode x = (== 0) . (`rem` 10) . div (vec ! i) $ x
-      f x v = bool (!) (!!) (mode (100*(10^(x-1)))) vec (i + x)
-   in (f 1 vec, f 2 vec, vec ! (i + 3))
+  let mode x = (== 0) . (`rem` 10) . div (index vec i) $ x
+      f x v = bool index (!!!) (mode (100*(10^(x-1)))) vec (i + x)
+   in (f 1 vec, f 2 vec, index vec (i + 3))
       
-compute :: Int -> [Int] -> [Int] -> Memory -> (Int, [Int])
-compute i input out vec =
-  let (a, b, c) = args i vec
-   in case rem (vec ! i) 100 of 
-        1 -> compute (i + 4) input out (vec // [(c, a + b)])
-        2 -> compute (i + 4) input out (vec // [(c, a * b)])
-        3 -> let ix = vec ! (i + 1)
-              in compute (i + 2) (tail input) out (vec // [(ix, head input)])
-        4 -> compute (i + 2) input (a : out) vec
-        5 -> compute (bool (i + 3) b (0 /= a)) input out vec
-        6 -> compute (bool (i + 3) b (0 == a)) input out vec
-        7 -> compute (i + 4) input out (vec // [(c, bool 0 1 (a < b))])
-        8 -> compute (i + 4) input out (vec // [(c, bool 0 1 (a == b))])
-        99 -> (vec ! 0, out)
+compute :: Int -> [Int] -> Memory -> [Int]
+compute i input memory =
+  let (a, b, c) = args i memory
+   in case rem (index memory i) 100 of 
+        1 -> compute (i + 4) input (S.update c (a + b) memory)
+        2 -> compute (i + 4) input (S.update c (a * b) memory)
+        3 -> let ix = index memory (i + 1)
+              in compute (i + 2) (tail input) (S.update ix (head input) memory)
+        4 -> a : compute (i + 2) input memory
+        5 -> compute (bool (i + 3) b (0 /= a)) input memory
+        6 -> compute (bool (i + 3) b (0 == a)) input memory
+        7 -> compute (i + 4) input (S.update c (bool 0 1 (a < b)) memory)
+        8 -> compute (i + 4) input (S.update c (bool 0 1 (a == b)) memory) 
+        99 -> []
         i -> error ("Invalid opcode: " ++ show i)
 
 solveA :: Memory -> Int
-solveA = head . snd . compute 0 [1] []
+solveA = last . compute 0 [1]
 
 solveB :: Memory -> Int
-solveB = head . snd . compute 0 [5] []
+solveB = last . compute 0 [5]
 
 main = do
   contents <- parser <$> readFile "data/input-2019-5.txt"
