@@ -12,4 +12,4 @@ cmd = f'curl https://adventofcode.com/{args.year}/day/{args.day}/input --cookie 
 
 output = subprocess.check_output(cmd, shell=True)
 
-print(output.decode('ascii'))
+print(output.decode('ascii'), end='')
