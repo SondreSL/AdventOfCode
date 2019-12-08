@@ -12,17 +12,17 @@ solveA w h str = (occ '1' xs) * (occ '2' xs)
   where occ n ls = length $ filter (== n) ls
         xs = minimumBy (comparing (occ '0')) $ chunksOf (w * h) str
 
-solveB :: Int -> Int -> String -> String
+solveB :: Int -> Int -> String -> IO ()
 solveB w h str = 
   let res = foldr1 color $ chunksOf (w * h) str
       f '1' = '#'
       f '0' = ' '
-   in intercalate "\n" . chunksOf w  $ map f res
+   in mapM_ putStrLn $ chunksOf w  $ map f res
 
 main = do
   str <- head . lines <$> readFile "data/input-2019-8.txt"
   print $ solveA 25 6 str
-  putStrLn $ solveB 25 6 str
+  solveB 25 6 str
 
 -- 1620
 -- BCYEF
