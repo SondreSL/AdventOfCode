@@ -20,7 +20,7 @@ solveB w h str =
    in mapM_ putStrLn $ chunksOf w  $ map f res
 
 main = do
-  str <- head . lines <$> readFile "data/input-2019-8.txt"
+  str <- init <$> readFile "data/input-2019-8.txt"
   print $ solveA 25 6 str
   solveB 25 6 str
 
