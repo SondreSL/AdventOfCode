@@ -16,20 +16,17 @@ parser = either (error "Bad parse") id . parse numbers "Opcodes"
 -- Logic
 type Memory = Seq Int
 
-(!!!) :: Memory -> Int -> Int
-(!!!) mem i = index mem (index mem i)
-
 args :: Int -> Int -> Memory -> (Int, Int, Int)
 args i rel vec = 
   let mode x = div (index vec i) x `rem` 10
-      f x = case mode (100*(10^(x-1))) of
-                0 -> vec !!! (i + x)
+      f x = case mode (10^(x+1)) of
+                0 -> index vec (index vec (i + x))
                 1 -> index vec (i + x)
                 2 -> index vec (rel + (index vec (i + x)))
-      g x = case div (index vec i) 10000 `rem` 10 of
-                2 -> rel + (index vec (i + 3))
-                _ -> index vec (i + 3)
-   in (f 1, f 2, g 3)
+      g = case div (index vec i) 10000 `rem` 10 of 
+            2 -> rel + (index vec (i + 3)) 
+            _ -> index vec (i + 3)
+   in (f 1, f 2, g)
       
 compute :: Int -> Int -> [Int] -> Memory -> [Int]
 compute i rel input memory =

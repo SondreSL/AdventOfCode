@@ -52,7 +52,6 @@ solveB m = case subtree m "YOU" "SAN" "COM" of
 main = do
   orbits <- parser <$> readFile "data/input-2019-6.txt"
   print $ solveA orbits
-  print $ solveB $ parser "COM)B\nB)YOU\nB)SAN"
   print $ solveB orbits
 
 -- 295936
