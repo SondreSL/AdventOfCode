@@ -15,8 +15,8 @@ solveA w h str = (occ '1' xs) * (occ '2' xs)
 solveB :: Int -> Int -> String -> IO ()
 solveB w h str = 
   let res = foldr1 color $ chunksOf (w * h) str
-      f '1' = '#'
-      f '0' = ' '
+      f '1' = '🔴'
+      f '0' = '🖤'
    in mapM_ putStrLn $ chunksOf w  $ map f res
 
 main = do
