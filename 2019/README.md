@@ -10,3 +10,4 @@
 - [Day 6](https://adventofcode.com/2019/day/6): Universal Orbit Map [[Haskell](Haskell/Day06.hs)]
 - [Day 7](https://adventofcode.com/2019/day/7): Amplification Circuit [[Haskell](Haskell/Day07.hs)]
 - [Day 8](https://adventofcode.com/2019/day/8): Space Image Format [[Haskell](Haskell/Day08.hs)]
+- [Day 9](https://adventofcode.com/2019/day/9): Sensor Boost [[Haskell](Haskell/Day09.hs)]
