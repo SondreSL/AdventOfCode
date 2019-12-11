@@ -16,6 +16,10 @@ parser = either (error "Bad parse") (M.fromList . zip [0..]) . parse numbers "Op
 -- Logic
 type Memory = M.Map Int Int
 
+data ProgramState = Wait Int Int [Int] [Int] Memory 
+                  | Halt [Int]
+                  deriving Show
+
 index :: Int -> Memory -> Int
 index = M.findWithDefault 0
 
@@ -31,30 +35,34 @@ args i rel mem =
             _ -> index (i + 3) mem
    in (f 1, f 2, g)
       
-compute :: Int -> Int -> [Int] -> Memory -> [Int]
-compute i rel input memory =
+compute :: Int -> Int -> [Int] -> [Int] -> Memory -> ProgramState
+compute i rel input out memory =
   let (a, b, c) = args i rel memory
    in case rem (M.findWithDefault 0 i memory) 100 of 
-        1 -> compute (i + 4) rel input (M.insert c (a + b) memory)
-        2 -> compute (i + 4) rel input (M.insert c (a * b) memory)
+        1 -> compute (i + 4) rel input out (M.insert c (a + b) memory)
+        2 -> compute (i + 4) rel input out (M.insert c (a * b) memory)
         3 -> let ix = case div (index i memory) 100 `rem` 10 of
                         2 -> rel + (index (i + 1) memory)
                         _ -> index (i + 1) memory 
-              in compute (i + 2) rel (tail input) (M.insert ix (head input) memory)
-        4 -> a : compute (i + 2) rel input memory
-        5 -> compute (bool (i + 3) b (0 /= a)) rel input memory
-        6 -> compute (bool (i + 3) b (0 == a)) rel input memory
-        7 -> compute (i + 4) rel input (M.insert c (bool 0 1 (a < b)) memory)
-        8 -> compute (i + 4) rel input (M.insert c (bool 0 1 (a == b)) memory) 
-        9 -> compute (i + 2) (rel + a) input memory
-        99 -> []
+              in compute (i + 2) rel (tail input) out (M.insert ix (head input) memory)
+        4 -> Wait (i + 2) rel input (a:out) memory
+        5 -> compute (bool (i + 3) b (0 /= a)) rel input out memory
+        6 -> compute (bool (i + 3) b (0 == a)) rel input out memory
+        7 -> compute (i + 4) rel input out (M.insert c (bool 0 1 (a < b)) memory)
+        8 -> compute (i + 4) rel input out (M.insert c (bool 0 1 (a == b)) memory) 
+        9 -> compute (i + 2) (rel + a) input out memory
+        99 -> Halt out
         i -> error ("Invalid opcode: " ++ show i)
 
+untilHalt :: ProgramState -> [Int]
+untilHalt (Wait i r inp out mem) = untilHalt $ compute i r inp out mem
+untilHalt (Halt a) = a
+
 solveA :: Memory -> Int
-solveA memory = head $ compute 0 0 [1] memory
+solveA memory = head . untilHalt $ compute 0 0 [1] [] memory
 
 solveB :: Memory -> Int
-solveB memory = head $ compute 0 0 [2] memory
+solveB memory = head . untilHalt $ compute 0 0 [2] [] memory
 
 main = do
   contents <- parser <$> readFile "data/input-2019-9.txt"
