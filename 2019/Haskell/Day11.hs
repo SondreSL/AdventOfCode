@@ -15,7 +15,7 @@ parser = either (error "Bad parse") (M.fromList . zip [0..]) . parse numbers "Op
         num = many1 digit 
         minus = (:) <$> char '-' <*> num
 
--- Logic
+-- Intcode computer
 type Memory = M.Map Int Int
 type Hull = M.Map Pos Int
 type Facing = Complex Float
@@ -63,13 +63,13 @@ compute i rel input out memory =
         i -> error ("Invalid opcode: " ++ show i)
 
 -- Paint robot
-runRobot :: ProgramState -> Hull -> Pos -> Facing -> (Int, M.Map Pos Int)
+runRobot :: ProgramState -> Hull -> Pos -> Facing -> (Int, Hull)
 runRobot (Halt []) hull pos fac = (length $ M.keys hull, hull)
-runRobot (Wait i r inp [c] m) hull pos fac =
+runRobot (Wait i r inp [color] m) hull pos fac =
   let (Wait ii rr input [new] mem) = compute i r inp [] m
       newFace = newDir fac new
       newPos = move pos newFace
-      newHull = M.insert pos c hull
+      newHull = M.insert pos color hull
       col = M.findWithDefault 0 newPos newHull
    in runRobot (compute ii rr (input ++ [col]) [] mem) newHull newPos newFace
 runRobot a hull pos fac = error $ show a
@@ -84,7 +84,7 @@ move (x, y) (1:+(-1)) = (x - 1, y) -- Left
 move (x, y) ((-1):+1) = (x + 1, y) -- Right
 move (x, y) ((-1):+(-1)) = (x, y - 1) -- Down
 
-printHull :: M.Map Pos Int -> IO ()
+printHull :: Hull -> IO ()
 printHull positions = 
   let ks = M.keys positions
       xs = map fst ks
@@ -94,7 +94,7 @@ printHull positions =
       lines = map (mkLine positions botX topX) [botY..topY]
    in mapM_ putStrLn $ reverse lines
 
-mkLine :: M.Map Pos Int -> Int -> Int -> Int -> String
+mkLine :: Hull -> Int -> Int -> Int -> String
 mkLine hull from to row
   | from > to = ""
   | otherwise = toChar (M.findWithDefault 0 (from, row) hull) : mkLine hull (from + 1) to row
@@ -102,13 +102,13 @@ mkLine hull from to row
 
 solveA :: Memory -> Int
 solveA mem = 
-  let (a, xs) = runRobot (compute 0 0 [0] [] mem) M.empty (0,0) (1:+1)
-   in a
+  let (count, _) = runRobot (compute 0 0 [0] [] mem) M.empty (0,0) (1:+1)
+   in count
 
 solveB :: Memory -> IO ()
 solveB mem = 
-  let (a, xs) = runRobot (compute 0 0 [1] [] mem) M.empty (0,0) (1:+1)
-   in printHull xs
+  let (_, hull) = runRobot (compute 0 0 [1] [] mem) M.empty (0,0) (1:+1)
+   in printHull hull
 
 main = do
   -- testIN <- parser <$> readFile "data/input-2019-9.txt"
