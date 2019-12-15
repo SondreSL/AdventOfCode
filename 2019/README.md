@@ -13,3 +13,7 @@
 - [Day 9](https://adventofcode.com/2019/day/9): Sensor Boost [[Haskell](Haskell/Day09.hs)]
 - [Day 10](https://adventofcode.com/2019/day/10): Monitoring Station [[Haskell](Haskell/Day10.hs)]
 - [Day 11](https://adventofcode.com/2019/day/11): Space Police [[Haskell](Haskell/Day11.hs)]
+- [Day 12](https://adventofcode.com/2019/day/12): The N-Body Problem [[Haskell](Haskell/Day12.hs)]
+- [Day 13](https://adventofcode.com/2019/day/13): Care Package [[Haskell](Haskell/Day13.hs)]
+- [Day 14](https://adventofcode.com/2019/day/14): Space Stoichiometry [[Haskell](Haskell/Day14.hs)]
+- [Day 15](https://adventofcode.com/2019/day/15): Oxygen System [[Haskell](Haskell/Day15.hs)]
