@@ -8,8 +8,7 @@ type Graph = M.Map Node [Node]
 type Edge = (Int, Int)
 
 parseEdge :: String -> [Edge]
-parseEdge = map toTup
-          . map (map read . splitOn "/")
+parseEdge = map (toTup . map read . splitOn "/")
           . lines
   where 
     toTup [x,y] = (x,y)
@@ -17,8 +16,7 @@ parseEdge = map toTup
 parse :: String -> Graph
 parse = (nub <$>)
       . foldl f M.empty 
-      . map toTup
-      . map (map read . splitOn "/")
+      . map (toTup . map read . splitOn "/")
       . lines
   where
     f acc (k, v) = M.insertWith (++) v [k] $ M.insertWith (++) k [v] acc
@@ -28,9 +26,9 @@ parse = (nub <$>)
 move :: Graph -> (Maybe Node, Node) -> [[Node]]
 move graph (prev, n) = addSelf . concatMap (move graph') . zip (repeat (Just n)) $ M.findWithDefault [] n graph'
   where
-    addSelf xs = if xs == [] then [[n]] else map (n:) xs
+    addSelf xs = if null xs then [[n]] else map (n:) xs
     edges = M.findWithDefault [] n graph
-    graph' = if prev == Nothing 
+    graph' = if isNothing prev
                 then graph 
                 else M.adjust (delete n) (fromJust prev) $ M.adjust (delete (fromJust prev)) n graph
 

@@ -1,0 +1,47 @@
+The first floor contains a strontium generator, a strontium-compatible microchip, a plutonium generator, and a plutonium-compatible microchip.
+The second floor contains a thulium generator, a ruthenium generator, a ruthenium-compatible microchip, a curium generator, and a curium-compatible microchip.
+The third floor contains a thulium-compatible microchip.
+The fourth floor contains nothing relevant.
+
+
+0  1. # SG   S   PG   P 
+   2.                         TG   RG   R   CG   C
+   3.                     T
+   4. 
+
+1  1.        S        P 
+   2. # SG       PG           TG   RG   R   CG   C
+   3.                     T
+   4. 
+
+2  1. #      S        P                 R
+   2.   SG       PG           TG   RG       CG   C
+   3.                     T
+   4. 
+
+3  1.                                   R
+   2. # SG   S   PG   P       TG   RG       CG   C
+   3.                     T
+   4. 
+
+4  1. #      S                          R
+   2.   SG       PG   P       TG   RG       CG   C
+   3.                     T
+   4. 
+
+5  1.                                    
+   2. # SG   S   PG   P       TG   RG   R   CG   C
+   3.                     T
+   4. 
+
+5 steps to get everything but T on lvl 2
+15 steps to move from 2 -> 3
+17 steps for 3 -> 4
+  = 37
+
+-- Part 2
+
+13 for 1 -> 2
+23 for 2 -> 3
+25 for 3 -> 4
+  = 61

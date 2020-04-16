@@ -40,6 +40,7 @@ def find_viable_pairs(nodes):
 
 def main():
     nodes = read_file('input/22.in')
+    print(len(nodes))
     print('Part 1:', find_viable_pairs(nodes))
 
 if __name__ == "__main__":

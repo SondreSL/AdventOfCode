@@ -1,3 +1,5 @@
+import Data.Group
+import Data.Monoid
 import Data.Function
 import Data.List.Extra
 import qualified Data.Vector as V
@@ -39,7 +41,7 @@ findRep = (+1)
         . cycle
 
 part1 :: [(VecString -> VecString)] -> VecString
-part1 = foldl (&) (V.fromList "abcdefghijklmnop")
+part1 = flip appEndo (V.fromList "abcdefghijklmnop") . foldMap Endo . reverse
 
 part2 :: [(VecString -> VecString)] -> VecString
 part2 input = part1 $ take rep (cycle input)

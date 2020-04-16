@@ -1,0 +1,45 @@
+                               
+00   cpy a d        d = a                                       |  d = a;    
+01   cpy 4 c        c = 4                                       |  c = 4;
+                               Block A                             while (c != 0) { // 4 times
+02   cpy 643 b      b = 643           <---+                     |      b = 643;   
+                                          |                           while (b != 0) { // 643 times
+03   inc d          d++               <-+ |                     |          d++;   
+04   dec b          b--                 | |                     |          b--;   
+05   jnz b -2       if b != 0 goto 03 --+ |                     |      }
+06   dec c          c--                   |                     |      c--;    
+07   jnz c -5       if c != 0 goto 02 ----+                     |  }
+
+                                                                   // d = a + 2572
+
+                                                                |
+08   cpy d a        a = d                                       |
+                               Block B                          |
+09   jnz 0 0                                                    | // No op
+
+10   cpy a b        b = a                                       |  b = a;
+11   cpy 0 a        a = 0                                       |  a = 0;
+                                                                |  while (True) {
+12   cpy 2 c        c = 2             <-------+                 |      c = 2;
+                                                                |      do {
+13   jnz b 2        if b != 0 goto 15 --+ <+  |                 |          if (b == 0) {
+14   jnz 1 6        goto 20             |  |  | --> Block c     |              --> goto Block C
+                                                                               c = if even b then 2 else 1
+15   dec b          b--               <-+  |  |                 |          }
+16   dec c          c--                    |  |                 |          b--; c--;
+17   jnz c -4       if c != 0 goto 13 -----+  |                 |      while (c != 0);
+18   inc a          a++                       |                 |      a++;
+19   jnz 1 -7       goto 12           --------+                 |  }
+                                                                   // a = a `div` 2; c = 2 - (a `mod` 2)
+
+                                Block C
+20   cpy 2 b        b = 2                                       |  b = 2;
+21   jnz c 2        if c != 0 goto 23  --+ <--+                 |  while (c != 0) {
+22   jnz 1 4        goto 26              |    | --+             |      b--;
+23   dec b          b--                <-+    |   |             |      c--; 
+24   dec c          c--                       |   |             |  }      
+25   jnz 1 -4       goto 21            -------+   |             |             
+26   jnz 0 0                           <----------+             |      
+27   out b          print b                                     |  output b          
+28   jnz a -19      if a != 0 goto 9  ---> Block B              |
+29   jnz 1 -21      goto 8                                      |

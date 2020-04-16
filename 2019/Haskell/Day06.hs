@@ -1,4 +1,6 @@
-import Data.List
+module Day06 where
+
+import Data.List.Extra
 import Data.Maybe
 import Data.Semigroup hiding (Sum)
 import qualified Data.Map as Map
@@ -29,7 +31,7 @@ instance Monoid Sum where
   mempty = Null
 
 cntOrbits :: Orbits -> Int -> String -> Int
-cntOrbits orbits n str = n + (sum $ map (cntOrbits orbits (n + 1)) $ Map.findWithDefault [] str orbits)
+cntOrbits orbits n str = n + sum (map (cntOrbits orbits (n + 1)) $ Map.findWithDefault [] str orbits)
 
 subtree :: Orbits -> String -> String -> String -> Sum
 subtree m a b curr = toSum $ Map.lookup curr m
