@@ -18,7 +18,6 @@ def get_data():
 
     for line in a:
         cap, dur, flav, text, cals = map(int, re.findall(r'-*\d', line))
-        name = line.split()[0]
         data.append(Ingredient(cap, dur, flav, text, cals))
 
     return data
@@ -32,7 +31,7 @@ def create_perms(n):
 def find_ratio(data, cals=False):
     best = 0
     for p in create_perms(len(data)):
-        new = list(map(sum, map(list, zip(*[value(i, v) for i, v in zip(data, p)]))))
+        new = list(map(sum, zip(*[value(i, v) for i, v in zip(data, p)])))
         if any(i <= 0 for i in new):
             continue
         if cals:
@@ -46,14 +45,10 @@ def find_ratio(data, cals=False):
 def value(ingredient, ratio):
     return [ratio * i for i in tuple(ingredient)]
 
-def solveA(data):
-    print('Part 1:', find_ratio(data))
-    print('Part 2:', find_ratio(data, cals=True))
-
-
 def main():
     data = get_data()
-    solveA(data)
+    print('Part 1:', find_ratio(data))
+    print('Part 2:', find_ratio(data, cals=True))
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,7 @@
 
 grid = [[0 for i in range(1000)] for j in range(1000)]
 
-for line in open('06.in'):
+for line in open('data/06.in'):
     line = line.split()
     if line[0] == 'toggle':
         x, y = map(int, line[1].split(','))

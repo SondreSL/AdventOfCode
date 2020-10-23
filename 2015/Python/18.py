@@ -70,9 +70,9 @@ def solveB(grid):
 
 
 def main():
-    grid = read_file('18.in')
+    grid = read_file('../data/18.in')
     print('Part 1:', simulate(grid))
-    grid = read_file('18.in')
+    grid = read_file('../data/18.in')
     print('Part 2:', solveB(grid))
 
 if __name__ == "__main__":

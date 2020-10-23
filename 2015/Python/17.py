@@ -1,6 +1,6 @@
 from itertools import combinations
 
-with open('17.in') as f:
+with open('../data/17.in') as f:
     CONTAINERS = [int(i) for i in f.read().splitlines()]
 
 def find_count(part2=False):
@@ -17,4 +17,5 @@ def find_count(part2=False):
 print('Part 1:', find_count())
 print('Part 2:', find_count(part2=True))
 
-# Attempts: 5942
+# 1638
+# 17

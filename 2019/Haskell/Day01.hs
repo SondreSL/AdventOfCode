@@ -5,7 +5,7 @@ strToInts :: String -> [Int]
 strToInts = map read . lines
 
 calcFuel :: Int -> Int
-calcFuel = subtract 2 . flip div 3
+calcFuel = subtract 2 . (`div` 3)
 
 solve :: [Int] -> Int
 solve = sum . map calcFuel

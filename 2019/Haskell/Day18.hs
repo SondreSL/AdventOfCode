@@ -3,7 +3,6 @@ import Data.Char
 import Data.Maybe
 import Control.Lens
 import Data.Bifunctor
-import Control.Arrow ((&&&))
 import qualified Data.Set as S
 import qualified Data.PQueue.Prio.Min as P
 import qualified Data.Map.Strict as M
@@ -43,7 +42,7 @@ value (Door v) = v
 
 -- Parsing and drawing
 parseLab :: String -> Labyrinth
-parseLab input = 
+parseLab input =
   let ls = lines input
       maxY = length ls
       maxX = (subtract 1) . length . head $ ls
@@ -55,7 +54,7 @@ parseLab input =
         | isAlpha o && isLower o = Key o
         | isAlpha o && isUpper o = Door o
    in M.fromList . filter ((/=Wall) . snd) . map (second object) . zip coords $ concat ls
-      
+
 -- Logic
 data Point = K { _name  :: Char
              , _pos   :: Pos
@@ -78,13 +77,13 @@ nbs lab seen (x,y) = filter notSeen . filter notWall $ [(x+1,y), (x-1,y), (x,y+1
 
 bfs :: Labyrinth -> Pos -> M.Map Char Point
 bfs lab initPos = go initialSeen initialQueue M.empty
-  where 
+  where
     initialQueue = foldr (P.insert 1) P.empty $ zip (nbs lab (S.singleton initPos) initPos) (repeat S.empty)
     initialSeen = foldr S.insert (S.singleton initPos) $ nbs lab S.empty initPos
-    go seen queue res = 
-      case P.getMin queue of 
+    go seen queue res =
+      case P.getMin queue of
         Nothing -> res
-        Just (n, (pos, drs)) -> 
+        Just (n, (pos, drs)) ->
           let neighbours = nbs lab seen pos
               val = M.findWithDefault Path pos lab
               (drs', res') = case val of
@@ -96,7 +95,7 @@ bfs lab initPos = go initialSeen initialQueue M.empty
            in go (foldr S.insert seen neighbours) queue' res'
 
 startPos :: Labyrinth -> Pos
-startPos lab = M.foldrWithKey (\k v acc -> if v == Player then k else acc) (0,0) lab
+startPos = M.foldrWithKey (\k v acc -> if v == Player then k else acc) (0,0)
 
 initialize :: Labyrinth -> M.Map Char (M.Map Char Point)
 initialize lab = M.fromList . map (\(pos, Key v) -> (v, bfs lab pos)) . M.toList $ M.filter isKey lab
@@ -111,19 +110,19 @@ mkQueue lab = P.filter isSubsetOf . foldr (uncurry P.insert) P.empty $ map toExp
 
 findNextPath :: M.Map Char (M.Map Char Point) -> Char -> S.Set Char -> [Point]
 findNextPath dists name seen = map snd . M.toList . M.filter f $ M.findWithDefault M.empty name dists
-  where 
+  where
     f (K n pos d dr) = not (toUpper n `S.member` seen) && dr `S.isSubsetOf` seen
 
 path :: Labyrinth -> Int
 path lab = go (mkQueue lab) (initialize lab) S.empty
   where
-    go pq dists seen = 
+    go pq dists seen =
       let (pri, (E len keysSeen k@(K name pos dist drs))) = P.findMin pq -- Cannot fail
           keysSeen' = S.insert (toUpper name) keysSeen
-          cands = findNextPath dists name keysSeen' 
+          cands = findNextPath dists name keysSeen'
           nextExp newK@(K n p d ds) = (len + d, E (len + d) keysSeen' newK)
           pq' = foldr (uncurry P.insert) (P.deleteMin pq) $ map nextExp cands
-       in case S.member (name, keysSeen') seen of 
+       in case S.member (name, keysSeen') seen of
             False -> case cands of
                        [] -> pri -- Finished
                        _ -> go pq' dists (S.insert (name, keysSeen') seen)
@@ -131,17 +130,17 @@ path lab = go (mkQueue lab) (initialize lab) S.empty
 
 -- For multiple labyrinths
 startPositions :: Labyrinth -> [Pos]
-startPositions lab = M.foldrWithKey (\k v acc -> if v == Player then k:acc else acc) [] lab
+startPositions = M.foldrWithKey (\k v acc -> if v == Player then k:acc else acc) []
 
 bfsPos :: Labyrinth -> Pos -> M.Map Pos Point
 bfsPos lab initPos = go initialSeen initialQueue M.empty
-  where 
+  where
     initialQueue = foldr (P.insert 1) P.empty $ zip (nbs lab (S.singleton initPos) initPos) (repeat S.empty)
     initialSeen = foldr S.insert (S.singleton initPos) $ nbs lab S.empty initPos
-    go seen queue res = 
-      case P.getMin queue of 
+    go seen queue res =
+      case P.getMin queue of
         Nothing -> res
-        Just (n, (pos, drs)) -> 
+        Just (n, (pos, drs)) ->
           let neighbours = nbs lab seen pos
               val = M.findWithDefault Path pos lab
               (drs', res') = case val of
@@ -153,7 +152,7 @@ bfsPos lab initPos = go initialSeen initialQueue M.empty
            in go (foldr S.insert seen neighbours) queue' res'
 
 -- mkQueue4 :: Labyrinth -> P.MinPQueue Int Explorer
--- mkQueue4 lab = P.fromList 
+-- mkQueue4 lab = P.fromList
 --   where
 --     intitial = startPositions lab
 
@@ -164,7 +163,7 @@ path4 :: Labyrinth -> Int
 path4 lab = undefined
 
 solveA :: Labyrinth -> Int
-solveA lab = path lab
+solveA = path
 
 solveB :: undefined
 solveB = undefined

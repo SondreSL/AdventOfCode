@@ -1,26 +1,25 @@
 -- Works, but the second part is very slow.
+module Main where
 
-parseFile = map (read :: String -> Int) . lines . filter (\x -> x /= '+')
+import qualified Data.Set as Set
+import           Data.Set   ( Set )
 
-solveA = foldr (+) 0 . parseFile
+parseFile :: String -> [Int]
+parseFile = map read . lines . filter (/= '+')
 
-acc :: [Int] -> Int
-acc xs =
-    let 
-    inner n seen [] = inner n seen xs
-    inner n seen (y:ys) = if elem n seen
-                            then n
-                            else inner (n + y) (n:seen) ys
-    in
-    inner 0 [] xs
+solveA :: String -> Int
+solveA = sum . parseFile
 
-solveB = acc . parseFile
-    
+solveB :: String -> Int
+solveB = findFirst Set.empty . scanl (+) 0 . cycle . parseFile
+ where
+  findFirst seen (new : xs) = if Set.member new seen
+                                 then new
+                                 else findFirst (Set.insert new seen) xs
 
 main :: IO ()
 main = do
-    -- Part 1
-    contents <- readFile "day01.txt"
+    contents <- readFile "data/day01.in"
     print $ solveA contents
     print $ solveB contents
 

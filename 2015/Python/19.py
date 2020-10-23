@@ -47,7 +47,7 @@ def solveB(start, target, codes):
     print('Part 2:', count)
 
 def main():
-    molecule, codes = read_file('19.in')
+    molecule, codes = read_file('../data/19.in')
     solveA(molecule, codes)
     solveB('e', molecule, codes)
 

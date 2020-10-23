@@ -5,7 +5,7 @@
 import Data.Finite
 import Data.Group
 import Data.Monoid
-import Data.Modular
+import Numeric.Modular
 import Data.Semigroup
 import Data.List.Extra
 import GHC.TypeNats (KnownNat)
@@ -40,7 +40,7 @@ recipNat a = a ^ (maxBound @(Finite 119315717514047) - 1)
 parser :: KnownNat n => String -> [Linear n]
 parser = map parse . lines
   where
-    parse line = case words line of 
+    parse line = case words line of
            ("cut":n:_)           -> L 1                   (negate (modulo $ read n))
            ("deal":"into":_)     -> L (negate 1)          (negate 1)
            ("deal":"with":_:n:_) -> L (modulo $ read n)   0
@@ -59,6 +59,7 @@ solveB input = getIndex (invert bigTrans) 2020
     totalTrans = mconcat $ reverse input
     bigTrans = stimes 101741582076661 totalTrans
 
+main :: IO ()
 main = do
   contents <- readFile "data/input-2019-22.txt"
 
