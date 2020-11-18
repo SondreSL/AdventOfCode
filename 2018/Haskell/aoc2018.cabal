@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3c0c64515979cf7e366c7d42e2c5ac6c99a6bd0b796f4229d5a471ebd67810fe
+-- hash: c1cb56585e6716c4e7e371fdccb90bfe4da8d8dd2ea555c62f8f3e4e6c159fa4
 
 name:           aoc2018
 version:        0.1.0.0
@@ -34,21 +34,29 @@ library
       Day05
       Day06
       Day07
+      Day08
+      Day09
+      Day10
+      Day11
       Lib
   other-modules:
       Paths_aoc2018
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      array
+    , base >=4.7 && <5
     , containers
+    , deepseq
     , dlist
     , extra
     , free-algebras
     , groups
     , lens
     , linear
+    , mtl
     , parsec
+    , pointedlist
     , vector
   default-language: Haskell2010
 
@@ -61,15 +69,19 @@ executable aoc2018-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aoc2018
+    , array
     , base >=4.7 && <5
     , containers
+    , deepseq
     , dlist
     , extra
     , free-algebras
     , groups
     , lens
     , linear
+    , mtl
     , parsec
+    , pointedlist
     , vector
   default-language: Haskell2010
 
@@ -83,14 +95,18 @@ test-suite aoc2018-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aoc2018
+    , array
     , base >=4.7 && <5
     , containers
+    , deepseq
     , dlist
     , extra
     , free-algebras
     , groups
     , lens
     , linear
+    , mtl
     , parsec
+    , pointedlist
     , vector
   default-language: Haskell2010

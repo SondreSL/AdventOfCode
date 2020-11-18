@@ -30,6 +30,10 @@ dependencies:
 - free-algebras
 - dlist
 - linear
+- mtl
+- pointedlist
+- array
+- deepseq
 
 library:
   source-dirs: src
