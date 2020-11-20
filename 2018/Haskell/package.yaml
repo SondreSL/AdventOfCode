@@ -34,6 +34,12 @@ dependencies:
 - pointedlist
 - array
 - deepseq
+- text
+- bytestring
+- finite-typelits
+- recursion-schemes
+- digits
+- MissingH
 
 library:
   source-dirs: src

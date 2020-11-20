@@ -1,8 +1,11 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TupleSections #-}
 module Lib
     ( freqs
     , display
     , findBounds
+    , parseAsciiMap
+    , asciiGrid
     ) where
 
 import qualified Data.Map as Map
@@ -12,6 +15,8 @@ import Data.List.Extra (chunksOf)
 import Data.Bool (bool)
 import Data.Array (accumArray, elems)
 import Data.Semigroup (Max(getMax, Max), Min(getMin, Min))
+import Control.Lens
+import Linear
 
 -- | Build a frequency map
 freqs :: (Foldable f, Ord a) => f a -> Map a Int
@@ -26,6 +31,17 @@ findBounds cs = (getMin minX, getMin minY, getMax maxX, getMax maxY)
  where
   (minX, minY, maxX, maxY) = foldMap f cs
   f (x, y) = (Min x, Min y, Max x, Max y)
+
+type Point = V2 Int
+
+parseAsciiMap
+    :: (Char -> Maybe a)
+    -> String
+    -> Map Point a
+parseAsciiMap f = ifoldMapOf (asciiGrid <. folding f) Map.singleton
+
+asciiGrid :: IndexedFold Point String Char
+asciiGrid = reindexed (uncurry (flip V2)) (lined <.> folded)
 
 display
   :: (Foldable t)

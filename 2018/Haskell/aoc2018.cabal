@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c1cb56585e6716c4e7e371fdccb90bfe4da8d8dd2ea555c62f8f3e4e6c159fa4
+-- hash: c184fd40e7eb0e1c3fbcafcb0a5599df4fe37650d8c2aca4663316059b972b68
 
 name:           aoc2018
 version:        0.1.0.0
@@ -38,18 +38,26 @@ library
       Day09
       Day10
       Day11
+      Day12
+      Day13
+      Day14
+      Day16
       Lib
   other-modules:
       Paths_aoc2018
   hs-source-dirs:
       src
   build-depends:
-      array
+      MissingH
+    , array
     , base >=4.7 && <5
+    , bytestring
     , containers
     , deepseq
+    , digits
     , dlist
     , extra
+    , finite-typelits
     , free-algebras
     , groups
     , lens
@@ -57,6 +65,8 @@ library
     , mtl
     , parsec
     , pointedlist
+    , recursion-schemes
+    , text
     , vector
   default-language: Haskell2010
 
@@ -68,13 +78,17 @@ executable aoc2018-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      aoc2018
+      MissingH
+    , aoc2018
     , array
     , base >=4.7 && <5
+    , bytestring
     , containers
     , deepseq
+    , digits
     , dlist
     , extra
+    , finite-typelits
     , free-algebras
     , groups
     , lens
@@ -82,6 +96,8 @@ executable aoc2018-exe
     , mtl
     , parsec
     , pointedlist
+    , recursion-schemes
+    , text
     , vector
   default-language: Haskell2010
 
@@ -94,13 +110,17 @@ test-suite aoc2018-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      aoc2018
+      MissingH
+    , aoc2018
     , array
     , base >=4.7 && <5
+    , bytestring
     , containers
     , deepseq
+    , digits
     , dlist
     , extra
+    , finite-typelits
     , free-algebras
     , groups
     , lens
@@ -108,5 +128,7 @@ test-suite aoc2018-test
     , mtl
     , parsec
     , pointedlist
+    , recursion-schemes
+    , text
     , vector
   default-language: Haskell2010
