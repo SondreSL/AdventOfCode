@@ -1,0 +1,14 @@
+#!/bin/bash
+
+
+for i in $(seq -f "%02g" 01 25);
+do
+  echo "module Day$i where
+
+parseInput = id
+
+main :: IO ()
+main = do
+  input <- parseInput <$> readFile \"../data/day$i.in\"
+  print input" > Day$i.hs;
+done
