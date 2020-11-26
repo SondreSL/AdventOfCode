@@ -15,9 +15,8 @@ import Data.Maybe (listToMaybe)
 
 type Memory = Map Int Int
 data Opcode
-  = Addr | Addi | Mulr | Muli | Banr | Bani
-  | Borr | Bori | Setr | Seti | Gtir
-  | Gtri | Gtrr | Eqir | Eqri | Eqrr
+  = Addr | Addi | Mulr | Muli | Banr | Bani | Borr | Bori
+  | Setr | Seti | Gtir | Gtri | Gtrr | Eqir | Eqri | Eqrr
   deriving (Show, Eq, Ord, Enum, Bounded)
 
 data Instruction a = I

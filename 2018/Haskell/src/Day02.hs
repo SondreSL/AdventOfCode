@@ -1,10 +1,6 @@
 module Day02 where
 
-import Data.List (
-  find,
-  group,
-  sort,
- )
+import Data.List (find, group, sort)
 import Data.Monoid (Sum (..))
 
 parse :: String -> [String]
