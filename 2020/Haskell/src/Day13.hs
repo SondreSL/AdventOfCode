@@ -1,5 +1,7 @@
 module Day13 where
 
+import Relude
+
 parseInput = id
 
 main :: IO ()

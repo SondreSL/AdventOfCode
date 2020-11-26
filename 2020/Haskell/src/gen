@@ -5,6 +5,8 @@ for i in $(seq -f "%02g" 01 25);
 do
   echo "module Day$i where
 
+import Relude
+
 parseInput = id
 
 main :: IO ()
