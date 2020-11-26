@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6de92d6717bb903301e7b9e97557a613ccd1fa519a815062d8805234f80ec029
+-- hash: 91186962c3aa4fc2de6e6cc7419355cbb21e3753f4bc1296b7fb9f9635c96006
 
 name:           aoc2020
 version:        0.1.0.0
@@ -57,6 +57,7 @@ library
       Paths_aoc2020
   hs-source-dirs:
       src
+  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor RankNTypes DataKinds
   build-depends:
       MissingH
     , array
@@ -76,6 +77,8 @@ library
     , parsec
     , pointedlist
     , recursion-schemes
+    , relude
+    , sbv
     , text
     , vector
   default-language: Haskell2010
@@ -86,6 +89,7 @@ executable aoc2020-exe
       Paths_aoc2020
   hs-source-dirs:
       app
+  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor RankNTypes DataKinds
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       MissingH
@@ -107,6 +111,8 @@ executable aoc2020-exe
     , parsec
     , pointedlist
     , recursion-schemes
+    , relude
+    , sbv
     , text
     , vector
   default-language: Haskell2010
@@ -118,6 +124,7 @@ test-suite aoc2020-test
       Paths_aoc2020
   hs-source-dirs:
       test
+  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor RankNTypes DataKinds
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       MissingH
@@ -139,6 +146,8 @@ test-suite aoc2020-test
     , parsec
     , pointedlist
     , recursion-schemes
+    , relude
+    , sbv
     , text
     , vector
   default-language: Haskell2010

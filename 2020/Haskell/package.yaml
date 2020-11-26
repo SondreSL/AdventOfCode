@@ -21,6 +21,7 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- relude
 - containers
 - lens
 - vector
@@ -40,6 +41,15 @@ dependencies:
 - recursion-schemes
 - digits
 - MissingH
+- sbv
+
+default-extensions:
+- BangPatterns
+- LambdaCase
+- TupleSections
+- DeriveFunctor
+- RankNTypes
+- DataKinds
 
 library:
   source-dirs: src

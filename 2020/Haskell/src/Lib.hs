@@ -10,17 +10,49 @@ module Lib (
   Point,
   neighbours,
   neighbours4,
-) where
+  binaryMinSearch,
+  firstReapeat,
+  linedNums,
+  commaNums,
+  mannDist,
+  unionFind
+)
+where
 
 import Control.Lens
 import Data.Array (accumArray, elems)
 import Data.Bool (bool)
 import Data.Foldable
-import Data.List.Extra (chunksOf)
+import Data.List.Extra (splitOn, chunksOf)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Semigroup (Max (Max, getMax), Min (Min, getMin))
-import Linear
+import Linear ( V2(..) )
+import qualified Data.Set as Set
+import           Data.Set ( Set )
+
+firstReapeat :: Ord a => [a] -> a
+firstReapeat = go Set.empty
+  where
+    go !seen (x:xs) = if Set.member x seen
+                        then go (Set.insert x seen) xs
+                        else x
+
+-- | Find the lowest value where the predicate is satisfied within the
+-- given bounds.
+binaryMinSearch
+    :: (Int -> Bool)
+    -> Int                  -- ^ min
+    -> Int                  -- ^ max
+    -> Maybe Int
+binaryMinSearch p = go
+  where
+    go !x !y
+        | x == mid || y == mid = Just (x + 1)
+        | p mid                = go x mid
+        | otherwise            = go mid y
+      where
+        mid = ((y - x) `div` 2) + x
 
 -- | Build a frequency map
 freqs :: (Foldable f, Ord a) => f a -> Map a Int
@@ -79,3 +111,21 @@ neighbours p0 =
 -- | Neighbours left, right, above and below
 neighbours4 :: Point -> [Point]
 neighbours4 p = (p +) <$> [V2 0 1, V2 1 0, V2 (-1) 0, V2 0 (-1)]
+
+mannDist :: (Foldable f, Num a, Num (f a)) => f a -> f a -> a
+mannDist x y = sum . abs $ x - y
+
+-- | Various simple parser
+linedNums :: String -> [Int]
+linedNums = map read . lines . filter (/= '+')
+
+commaNums :: String -> [Int]
+commaNums = map read . splitOn ","
+
+-- Fold
+unionFind :: Ord a => (a -> Set a -> Bool) -> [a] -> Set (Set a)
+unionFind f = foldl' go Set.empty
+  where
+    go set x = let (same, diff) = Set.partition (f x) set
+                in Set.insert (Set.unions same <> Set.singleton x) diff
+
