@@ -1,28 +1,12 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TupleSections #-}
 
-module Lib (
-  freqs,
-  display,
-  findBounds,
-  parseAsciiMap,
-  asciiGrid,
-  Point,
-  neighbours,
-  neighbours4,
-  binaryMinSearch,
-  firstReapeat,
-  linedNums,
-  commaNums,
-  mannDist,
-  unionFind
-)
-where
+module Lib where
 
 import Control.Lens
 import Data.Array (accumArray, elems)
 import Data.Bool (bool)
-import Data.Foldable
+import Data.Foldable ( Foldable(foldl', toList) )
 import Data.List.Extra (splitOn, chunksOf)
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -30,13 +14,23 @@ import Data.Semigroup (Max (Max, getMax), Min (Min, getMin))
 import Linear ( V2(..) )
 import qualified Data.Set as Set
 import           Data.Set ( Set )
+import Control.Monad (foldM)
 
-firstReapeat :: Ord a => [a] -> a
-firstReapeat = go Set.empty
-  where
-    go !seen (x:xs) = if Set.member x seen
-                        then go (Set.insert x seen) xs
-                        else x
+rotate :: Int -> [a] -> [a]
+rotate = drop <> take
+
+zipWithTail :: [a] -> [(a, a)]
+zipWithTail = zip <*> tail
+
+zipWithTail' :: [a] -> [(a, a)]
+zipWithTail' = zip <*> rotate 1
+
+firstReapeat :: [Integer] -> Maybe Integer
+firstReapeat = either Just (const Nothing) . foldM f Set.empty
+ where
+  f seen x
+    | Set.member x seen = Left x
+    | otherwise = Right $ Set.insert x seen
 
 -- | Find the lowest value where the predicate is satisfied within the
 -- given bounds.
@@ -128,4 +122,3 @@ unionFind f = foldl' go Set.empty
   where
     go set x = let (same, diff) = Set.partition (f x) set
                 in Set.insert (Set.unions same <> Set.singleton x) diff
-
