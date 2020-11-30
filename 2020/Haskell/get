@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -r "../.cookie" ]; then
-  source "../.cookie"
+	source "../.cookie"
 fi
 
 export TZ=CET
@@ -11,16 +11,16 @@ thisday="$(date +%d)"
 
 year=2020
 
-if [ "$thisyear" -ne "$year" -o "$thismonth" -ne 12 -o "$thisday" -lt 26 ]; then
-    echo "Not a valid date: $thisday / $thismonth / $thisyear"
-    exit 0
+if [ "$thisyear" -ne "$year" ] || [ "$thismonth" -ne 12 ] || [ "$thisday" -lt 26 ]; then
+	echo "Not a valid date: $thisday / $thismonth / $thisyear"
+	exit 0
 fi
 
-filename="../data/day$thisday".in
+filename="../data/day$thisday.in"
 
 if [ -r "$filename" ]; then
-    echo "Filename $filename already exists!"
-    exit 0
+	echo "Filename $filename already exists!"
+	exit 0
 fi
 
 curl -sS -o "$filename" -b "$AOC_COOKIE" https://adventofcode.com/"$year"/day/"$day"/input
