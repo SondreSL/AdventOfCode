@@ -11,7 +11,7 @@ thisday="$(date +%d)"
 
 year=2020
 
-if [ "$thisyear" -ne "$year" ] || [ "$thismonth" -ne 12 ] || [ "$thisday" -lt 26 ]; then
+if [ "$thisyear" -ne "$year" ] || [ "$thismonth" -ne 12 ] || [ "$thisday" -gt 25 ]; then
 	echo "Not a valid date: $thisday / $thismonth / $thisyear"
 	exit 0
 fi

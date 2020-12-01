@@ -42,14 +42,21 @@ dependencies:
 - digits
 - MissingH
 - sbv
+- lens-regex-pcre
 
 default-extensions:
 - BangPatterns
 - LambdaCase
 - TupleSections
 - DeriveFunctor
+- DeriveTraversable
+- DeriveFoldable
+- TemplateHaskell
 - RankNTypes
 - DataKinds
+- QuasiQuotes
+- TypeApplications
+  # - OverloadedStrings
 
 library:
   source-dirs: src
