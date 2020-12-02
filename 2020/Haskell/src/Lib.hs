@@ -14,7 +14,18 @@ import Data.Semigroup (Max (Max, getMax), Min (Min, getMin))
 import Linear ( V2(..) )
 import qualified Data.Set as Set
 import           Data.Set ( Set )
-import Control.Monad (foldM)
+import Control.Monad (guard, foldM)
+-- import Data.Monoid ( Sum(Sum, getSum) )
+
+isPrime :: Integral a => a -> Bool
+isPrime n = null $ do
+              x <- 2 : [ 3, 5 .. round (sqrt $ fromIntegral n) ]
+              guard $ n `mod` x == 0
+              pure x
+
+count :: Foldable t => (a -> Bool) -> t a -> Int
+count p = length . filter p . toList
+-- count p = getSum . foldMap (bool (Sum 0) (Sum 1) . p)
 
 rotate :: Int -> [a] -> [a]
 rotate = drop <> take
@@ -25,7 +36,7 @@ zipWithTail = zip <*> tail
 zipWithTail' :: [a] -> [(a, a)]
 zipWithTail' = zip <*> rotate 1
 
-firstReapeat :: [Integer] -> Maybe Integer
+firstReapeat :: (Foldable t, Ord a) => t a -> Maybe a
 firstReapeat = either Just (const Nothing) . foldM f Set.empty
  where
   f seen x
@@ -122,3 +133,32 @@ unionFind f = foldl' go Set.empty
   where
     go set x = let (same, diff) = Set.partition (f x) set
                 in Set.insert (Set.unions same <> Set.singleton x) diff
+
+-- Some directional stuff, for moving in a certain facing
+data Dir = North | South | East | West
+  deriving (Ord, Eq, Show, Bounded, Enum)
+
+-- North is like moving forward, so does not change direction
+instance Semigroup Dir where
+  (<>) North = id
+  (<>) East  = \case North -> East
+                     East  -> South
+                     South -> West
+                     West  -> North
+  (<>) South = \case North -> South
+                     East  -> West
+                     South -> North
+                     West  -> East
+  (<>) West  = \case North -> West
+                     East  -> North
+                     South -> East
+                     West  -> South
+
+instance Monoid Dir where
+  mempty = North
+
+dirPoint :: Dir -> Point
+dirPoint North = V2 0 1
+dirPoint South = V2 0 (-1)
+dirPoint West = V2 (-1) 0
+dirPoint East = V2 1 0
