@@ -1,4 +1,4 @@
-module Main where
+module Day22 where
 
 import           Data.Monoid
 import qualified Data.Set                      as Set
@@ -27,13 +27,13 @@ part1 = Set.size . Set.filter f . (Set.cartesianProduct <*> id)
   f (a, b) = used a > 0 && (x a, y a) /= (x b, y b) && used a <= avail b
 
 -- printSet :: Set Node -> IO ()
--- printSet set = 
+-- printSet set =
 --   let
 --   maxX = maximum $ map x set
 --   maxY = maximum $ map y set
---   printNode (N x y s u a p) 
+--   printNode (N x y s u a p)
 --     | u == 0 = " _/" ++ show avail
---     | x == 0 && y == 
+--     | x == 0 && y ==
 --   loop xx yy = x <- [0 .. x]
 --                y <- [0 .. y]
 

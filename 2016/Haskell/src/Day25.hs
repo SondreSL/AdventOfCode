@@ -1,4 +1,4 @@
-module Main where
+module Day25 where
 
 import           Data.Char                      ( isDigit )
 import           Data.Function                  ( fix )

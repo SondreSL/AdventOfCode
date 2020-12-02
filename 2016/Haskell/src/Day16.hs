@@ -1,4 +1,4 @@
-module Main where
+module Day16 where
 
 import           Data.List                      ( delete )
 import           Control.Lens                   ( toListOf
