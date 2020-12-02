@@ -1,7 +1,7 @@
 # Advent of Code 2020
 
 * [x] [Day 1](Haskell/src/Day01.hs)
-* [ ] [Day 2](Haskell/src/Day02.hs)
+* [x] [Day 2](Haskell/src/Day02.hs)
 * [ ] [Day 3](Haskell/src/Day03.hs)
 * [ ] [Day 4](Haskell/src/Day04.hs)
 * [ ] [Day 5](Haskell/src/Day05.hs)
