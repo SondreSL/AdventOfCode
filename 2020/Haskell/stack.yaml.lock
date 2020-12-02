@@ -18,6 +18,13 @@ packages:
       sha256: 9bb3bb8dbb26363388e013c795e60e81f9b243ecac6e28b3e9d7079c083ebdf4
   original:
     hackage: sbv-8.9
+- completed:
+    hackage: lens-regex-pcre-1.1.0.0@sha256:a6053fefae59f6b53b4741e5a75c5fae350af80dbf62e8673b565e1c3f34f8b9,2209
+    pantry-tree:
+      size: 630
+      sha256: 84a02d84433d92c5e2a9a7bfd662244be607b4004c7d4d6fd1ba53adbc655022
+  original:
+    hackage: lens-regex-pcre-1.1.0.0
 snapshots:
 - completed:
     size: 532414

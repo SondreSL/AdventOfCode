@@ -1,14 +1,22 @@
 #!/bin/bash
 
+for i in $(seq -f "%02g" 02 25); do
+	echo "module Day$i where
 
-for i in $(seq -f "%02g" 01 25);
-do
-  echo "module Day$i where
+import Lib
+import Data.Maybe
+import Data.List.Extra
 
 parseInput = id
+
+part1 input = undefined
+
+part2 input = undefined
 
 main :: IO ()
 main = do
   input <- parseInput <$> readFile \"../data/day$i.in\"
-  print input" > Day$i.hs;
+  print input
+  -- print $ part1 input
+  -- print $ part2 input" >Day$i.hs
 done
