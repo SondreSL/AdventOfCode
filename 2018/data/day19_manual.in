@@ -1,0 +1,42 @@
+#ip 4
+00: addi 4 16 4     -->   4 := 16
+01: seti 1 5 1      -->   1 := 5
+02: seti 1 2 2      -->   2 := 2
+03: mulr 1 2 3      -->   3 := 5 * 2 = 10
+
+04: eqrr 3 5 3      -->   3 := if (3) == (5)
+                                  then 1
+                                  else 0
+
+05: addr 3 4 4      -->   4 := (4) + (3)
+06: addi 4 1 4      -->   4 := (4) + 1
+
+07: addr 1 0 0
+08: addi 2 1 2
+09: gtrr 2 5 3
+10: addr 4 3 4
+11: seti 2 7 4
+12: addi 1 1 1
+13: gtrr 1 5 3
+14: addr 3 4 4
+15: seti 1 9 4
+16: mulr 4 4 4
+17: addi 5 2 5
+18: mulr 5 5 5
+19: mulr 4 5 5
+20: muli 5 11 5
+21: addi 3 1 3
+22: mulr 3 4 3
+23: addi 3 18 3
+24: addr 5 3 5
+25: addr 4 0 4
+26: seti 0 3 4      4 := 3 -- Jump to 4 (4 is incremented after the instruction)
+27: setr 4 2 3
+28: mulr 3 4 3
+29: addr 4 3 3
+30: mulr 4 3 3
+31: muli 3 14 3
+32: mulr 3 4 3
+33: addr 5 3 5
+34: seti 0 4 0
+35: seti 0 5 4
