@@ -1,36 +1,37 @@
 module Day03 where
 
-import Control.Lens ( folded, maximumOf, view )
+import Control.Lens (bimap, view, _2)
 import qualified Data.Map as Map
+import Data.Semigroup (Max (Max, getMax))
 import Data.Set (Set)
 import qualified Data.Set as Set
-import Lib (Point, count, parseAsciiMap)
-import Linear (R1 (_x), R2 (_y), V2 (V2))
+import Lib (count, parseAsciiMap, pointToTuple)
 
-parseInput :: String -> Set Point
-parseInput = Map.keysSet . parseAsciiMap f
+type Tuple = (Int, Int)
+
+parseInput :: String -> Set Tuple
+parseInput = Set.map pointToTuple . Map.keysSet . parseAsciiMap f
   where
     f '#' = Just True
     f _ = Nothing
 
-toboggan :: Set Point -> Point -> Int
+toboggan :: Set Tuple -> Tuple -> Int
 toboggan input = count (`Set.member` input) . slope
   where
-    Just maxY = maximumOf (folded . _y) input
-    Just maxX = maximumOf (folded . _x) input
-    slope p = takeWhile ((<= maxY) . view _y) $ iterate (addMod p) (V2 0 0)
-    addMod (V2 x y) (V2 x' y') = V2 ((x + x') `mod` succ maxX) (y + y')
+    (maxX, maxY) = bimap getMax getMax $ foldMap (bimap Max Max) input
+    slope p = takeWhile ((<= maxY) . view _2) $ iterate (addMod p) (0, 0)
+    addMod (x, y) (x', y') = ((x + x') `mod` succ maxX, y + y')
 
-part1 :: Set Point -> Point -> Int
+part1 :: Set Tuple -> Tuple -> Int
 part1 = toboggan
 
-part2 :: Set Point -> Int
-part2 = product . (<$> [V2 1 1, V2 3 1, V2 5 1, V2 7 1, V2 1 2]) . toboggan
+part2 :: Set Tuple -> Int
+part2 = product . (<$> [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]) . toboggan
 
 main :: IO ()
 main = do
   input <- parseInput <$> readFile "../data/day03.in"
-  print $ part1 input (V2 3 1)
+  print $ part1 input (3, 1)
   print $ part2 input
 
 -- 299
