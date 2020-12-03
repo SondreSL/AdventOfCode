@@ -2,7 +2,7 @@ module Day03 where
 
 import Control.Lens (bimap, view, _2)
 import qualified Data.Map as Map
-import Data.Semigroup (Max (Max, getMax))
+import Data.Semigroup ( Max(Max) )
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Lib (count, parseAsciiMap, pointToTuple)
@@ -18,7 +18,7 @@ parseInput = Set.map pointToTuple . Map.keysSet . parseAsciiMap f
 toboggan :: Set Tuple -> Tuple -> Int
 toboggan input = count (`Set.member` input) . slope
   where
-    (maxX, maxY) = bimap getMax getMax $ foldMap (bimap Max Max) input
+    (Max maxX, Max maxY) = foldMap (bimap Max Max) input
     slope p = takeWhile ((<= maxY) . view _2) $ iterate (addMod p) (0, 0)
     addMod (x, y) (x', y') = ((x + x') `mod` succ maxX, y + y')
 
