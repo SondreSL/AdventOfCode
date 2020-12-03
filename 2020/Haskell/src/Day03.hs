@@ -10,8 +10,8 @@ import Linear (R1 (_x), R2 (_y), V2 (V2))
 parseInput :: String -> Set Point
 parseInput = Map.keysSet . parseAsciiMap f
   where
-    f '.' = Nothing
     f '#' = Just True
+    f _ = Nothing
 
 toboggan :: Set Point -> Point -> Int
 toboggan input = count (`Set.member` input) . slope
@@ -25,7 +25,7 @@ part1 :: Set Point -> Point -> Int
 part1 = toboggan
 
 part2 :: Set Point -> Int
-part2 input = product $ map (toboggan input) [V2 1 1, V2 3 1, V2 5 1, V2 7 1, V2 1 2]
+part2 = product . (<$> [V2 1 1, V2 3 1, V2 5 1, V2 7 1, V2 1 2]) . toboggan
 
 main :: IO ()
 main = do
