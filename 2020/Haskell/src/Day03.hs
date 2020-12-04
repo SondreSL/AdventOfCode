@@ -1,6 +1,6 @@
 module Day03 where
 
-import Control.Lens (bimap, view, _2)
+import Control.Lens (bimap)
 import qualified Data.Map as Map
 import Data.Semigroup ( Max(Max) )
 import Data.Set (Set)
@@ -19,7 +19,7 @@ toboggan :: Set Tuple -> Tuple -> Int
 toboggan input = count (`Set.member` input) . slope
   where
     (Max maxX, Max maxY) = foldMap (bimap Max Max) input
-    slope p = takeWhile ((<= maxY) . view _2) $ iterate (addMod p) (0, 0)
+    slope p = takeWhile ((<= maxY) . snd) $ iterate (addMod p) (0, 0)
     addMod (x, y) (x', y') = ((x + x') `mod` succ maxX, y + y')
 
 part1 :: Set Tuple -> Tuple -> Int
