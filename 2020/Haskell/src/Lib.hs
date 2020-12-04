@@ -76,6 +76,9 @@ findBounds cs = (getMin minX, getMin minY, getMax maxX, getMax maxY)
 
 type Point = V2 Int
 
+pointToTuple :: Point -> (Int, Int)
+pointToTuple (V2 x y) = (x, y)
+
 parseAsciiMap ::
   (Char -> Maybe a) ->
   String ->
