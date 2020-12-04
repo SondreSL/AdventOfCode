@@ -34,8 +34,8 @@ main :: IO ()
 main = do
   run "01" Day01.main
   run "02" Day02.main
-  -- run "03" Day03.main
-  -- run "04" Day04.main
+  run "03" Day03.main
+  run "04" Day04.main
   -- run "05" Day05.main
   -- run "06" Day06.main
   -- run "07" Day07.main
