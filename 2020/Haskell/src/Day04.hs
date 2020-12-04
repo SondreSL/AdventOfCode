@@ -31,7 +31,7 @@ data Passport
   deriving (Show)
 
 parseInput :: String -> [[Passport]]
-parseInput = either (error . show) id . parse (sepBy passport (many1 space)) ""
+parseInput = either (error . show) id . parse (sepBy passport space) ""
   where
     chars = alphaNum <|> char '#'
     passport = sepEndBy passports space
