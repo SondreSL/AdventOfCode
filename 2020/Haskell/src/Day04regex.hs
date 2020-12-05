@@ -16,14 +16,14 @@ main = do
         r1 s = s ^.. [regex|byr:|iyr:|eyr:|hgt:|hcl:|ecl:|pid:|] . match
         r2 s =
             s
-                ^.. ( [regex|(byr:(19[2-9][0-9]|200[0-2]))|]
-                        <> [regex|(iyr:(201[0-9]|2020))|]
-                        <> [regex|(eyr:(202[0-9]|2030))|]
-                        <> [regex|(hgt:(1[5-8][0-9]|19[0-3])cm)|]
-                        <> [regex|(hgt:(5[8-9]|6[0-9]|7[0-6])in)|]
-                        <> [regex|(hcl:#[0-9a-f]{6})|]
-                        <> [regex|(ecl:(amb|blu|brn|gry|grn|hzl|oth))|]
-                        <> [regex|(pid:[0-9]{9}(\n| |$))|]
+                ^.. ( [regex|byr:(19[2-9][0-9]|200[0-2])|]
+                        <> [regex|iyr:(201[0-9]|2020)|]
+                        <> [regex|eyr:(202[0-9]|2030)|]
+                        <> [regex|hgt:(1[5-8][0-9]|19[0-3])cm|]
+                        <> [regex|hgt:(5[8-9]|6[0-9]|7[0-6])in|]
+                        <> [regex|hcl:#[0-9a-f]{6}|]
+                        <> [regex|ecl:(amb|blu|brn|gry|grn|hzl|oth)|]
+                        <> [regex|pid:[0-9]{9}\b|]
                     )
                     . match
     print $ passports r1
