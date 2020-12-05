@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 979f1b5243aff045603fdfd3fe4f369c97069d71bb2603f073eaeab60e649fd2
+-- hash: 1a4f47987b00baa9a62c8535073dcb9150bb5dc0f28a536284df5939e1cd2648
 
 name:           aoc2020
 version:        0.1.0.0
@@ -31,6 +31,7 @@ library
       Day02
       Day03
       Day04
+      Day04HKD
       Day05
       Day06
       Day07
@@ -69,6 +70,7 @@ library
     , dlist
     , extra
     , finite-typelits
+    , foldl
     , free-algebras
     , groups
     , lens
@@ -104,6 +106,7 @@ executable aoc2020-exe
     , dlist
     , extra
     , finite-typelits
+    , foldl
     , free-algebras
     , groups
     , lens
@@ -140,6 +143,7 @@ test-suite aoc2020-test
     , dlist
     , extra
     , finite-typelits
+    , foldl
     , free-algebras
     , groups
     , lens

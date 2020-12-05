@@ -43,6 +43,7 @@ dependencies:
 - MissingH
 - sbv
 - lens-regex-pcre
+- foldl
 
 default-extensions:
 - BangPatterns
