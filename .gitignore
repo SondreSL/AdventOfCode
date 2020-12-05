@@ -40,6 +40,8 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
+aoc2020*
+.cookie
 
 ### macOS ###
 # General

@@ -5,6 +5,8 @@ import qualified Day01
 import qualified Day02
 import qualified Day03
 import qualified Day04
+import qualified Day04HKD
+import qualified Day04regex
 import qualified Day05
 import qualified Day06
 import qualified Day07
