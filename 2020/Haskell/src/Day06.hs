@@ -1,18 +1,17 @@
 module Day06 where
 
-import Lib
-import Data.Maybe
-import Data.List.Extra
+import Data.List.Extra ( splitOn )
+import qualified Data.Set as Set
+import           Data.Set   ( Set )
 
-parseInput = id
-
-part1 input = undefined
-
-part2 input = undefined
+parseInput :: String -> [[Set Char]]
+parseInput = map (map Set.fromList . lines) . splitOn "\n\n"
 
 main :: IO ()
 main = do
   input <- parseInput <$> readFile "../data/day06.in"
-  print input
-  -- print $ part1 input
-  -- print $ part2 input
+  print . sum . map (length . Set.unions) $ input
+  print . sum . map (length . foldl Set.intersection (Set.fromList ['a'..'z'])) $ input
+
+-- 6799
+-- 3354
