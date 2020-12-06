@@ -48,14 +48,14 @@ parseInput = either (error . show) id . parse (sepBy passport space) ""
 part1 :: [[Passport]] -> Int
 part1 = count valid
   where
-    valid = (>= 7) . length . filter validate
+    valid = (>= 7) . count validate
     validate (CountryID _) = False
     validate _ = True
 
 part2 :: [[Passport]] -> Int
 part2 = count valid
   where
-    valid = (>= 7) . length . filter validate
+    valid = (>= 7) . count validate
     validate (BirthYear i) = 1920 <= i && i <= 2002
     validate (IssueYear i) = 2010 <= i && i <= 2020
     validate (ExpirationYear i) = 2020 <= i && i <= 2030
