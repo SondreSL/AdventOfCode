@@ -57,6 +57,7 @@ default-extensions:
 - DataKinds
 - QuasiQuotes
 - TypeApplications
+- ViewPatterns
   # - OverloadedStrings
 
 library:
