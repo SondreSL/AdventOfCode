@@ -11,7 +11,7 @@ import Control.Lens (
  )
 import Data.Char (toUpper)
 import Data.List (find)
-import Data.Maybe (listToMaybe, mapMaybe)
+import Data.Maybe (mapMaybe)
 import Data.Vector (Vector)
 import qualified Data.Vector as Vec
 import Lib (firstRepeatOn)
@@ -43,22 +43,24 @@ run p@Program{..} = case _instructions ^? ix _ip of
 part1 :: [Instruction] -> Maybe Int
 part1 = fmap _acc . firstRepeatOn _ip . iterate run . mkProgram
 
-changeInstructions :: [Instruction] -> [Instruction] -> [[Instruction]]
-changeInstructions pre post =
-    let (bef, i : aft) = break candidate post
-        pre' = pre ++ bef
-     in (pre' ++ (changeInst i : aft)) : changeInstructions (pre' ++ [i]) aft
+changeInstructions :: [Instruction] -> [[Instruction]]
+changeInstructions = go []
   where
-    candidate (Acc _) = False
-    candidate _ = True
-    changeInst (Jmp i) = Nop i
-    changeInst (Nop i) = Jmp i
-    changeInst n = n
+    go pre post =
+        let (bef, i : aft) = break candidate post
+            pre' = pre ++ bef
+         in (pre' ++ (changeInst i : aft)) : go (pre' ++ [i]) aft
+      where
+        candidate (Acc _) = False
+        candidate _ = True
+        changeInst (Jmp i) = Nop i
+        changeInst (Nop i) = Jmp i
+        changeInst n = n
 
 part2 :: [Instruction] -> Maybe Int
-part2 = listToMaybe . mapMaybe check . changeInstructions []
+part2 = fmap _acc . find ((== 647) . _ip) . mapMaybe check . changeInstructions
   where
-    check = fmap _acc . find ((== 647) . _ip) . take 300 . iterate run . mkProgram
+    check = firstRepeatOn _ip . iterate run . mkProgram
 
 main :: IO ()
 main = do
