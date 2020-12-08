@@ -1,23 +1,17 @@
 module Day08 where
 
-import Control.Lens (
-    Ixed (ix),
-    makeLenses,
-    over,
-    (&),
-    (+~),
-    (^?),
-    _head,
- )
+import Control.Lens
 import Data.Char (toUpper)
 import Data.List (find)
 import Data.Maybe (mapMaybe)
 import Data.Vector (Vector)
 import qualified Data.Vector as Vec
 import Lib (firstRepeatOn)
+import Control.Comonad.Store ( peeks )
 
 data Instruction = Nop Int | Jmp Int | Acc Int
     deriving (Show, Eq, Ord, Read)
+makePrisms ''Instruction
 
 data Program = Program
     { _instructions :: Vector Instruction
@@ -40,22 +34,15 @@ run p@Program{..} = case _instructions ^? ix _ip of
     Just (Acc i) -> p & ip +~ 1 & acc +~ i
     Nothing -> p
 
+changeInstructions :: [Instruction] -> [[Instruction]]
+changeInstructions input = map (peeks changeInst) (holesOf (traverse . filtered (hasn't _Acc))  input)
+  where
+    changeInst (Jmp i) = Nop i
+    changeInst (Nop i) = Jmp i
+    changeInst n = n
+
 part1 :: [Instruction] -> Maybe Int
 part1 = fmap _acc . firstRepeatOn _ip . iterate run . mkProgram
-
-changeInstructions :: [Instruction] -> [[Instruction]]
-changeInstructions = go []
-  where
-    go pre post =
-        let (bef, i : aft) = break candidate post
-            pre' = pre ++ bef
-         in (pre' ++ (changeInst i : aft)) : go (pre' ++ [i]) aft
-      where
-        candidate (Acc _) = False
-        candidate _ = True
-        changeInst (Jmp i) = Nop i
-        changeInst (Nop i) = Jmp i
-        changeInst n = n
 
 part2 :: [Instruction] -> Maybe Int
 part2 = fmap _acc . find ((== 647) . _ip) . mapMaybe check . changeInstructions

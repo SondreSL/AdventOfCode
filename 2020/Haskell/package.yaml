@@ -44,6 +44,7 @@ dependencies:
 - sbv
 - lens-regex-pcre
 - foldl
+- comonad
 
 default-extensions:
 - BangPatterns
