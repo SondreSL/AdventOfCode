@@ -36,12 +36,16 @@ zipWithTail = zip <*> tail
 zipWithTail' :: [a] -> [(a, a)]
 zipWithTail' = zip <*> rotate 1
 
-firstReapeat :: (Foldable t, Ord a) => t a -> Maybe a
-firstReapeat = either Just (const Nothing) . foldM f Set.empty
+firstRepeat :: (Foldable t, Ord a) => t a -> Maybe a
+firstRepeat = firstRepeatOn id
+
+firstRepeatOn :: (Foldable t, Ord b) => (a -> b) -> t a -> Maybe a
+firstRepeatOn project = either Just (const Nothing) . foldM f Set.empty
  where
-  f seen x
-    | Set.member x seen = Left x
-    | otherwise = Right $ Set.insert x seen
+   f seen x = let var = project x
+               in if Set.member var seen
+                     then Left x
+                     else Right $ Set.insert var seen
 
 -- | Find the lowest value where the predicate is satisfied within the
 -- given bounds.
