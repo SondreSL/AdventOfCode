@@ -40,8 +40,8 @@ main = do
   run "04" Day04.main
   run "05" Day05.main
   run "06" Day06.main
-  -- run "07" Day07.main
-  -- run "08" Day08.main
+  run "07" Day07.main
+  run "08" Day08.main
   -- run "09" Day09.main
   -- run "10" Day10.main
   -- run "11" Day11.main
