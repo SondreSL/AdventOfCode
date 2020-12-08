@@ -1,21 +1,34 @@
 module Day08 where
 
-import Lib
-import Control.Lens
+import Control.Lens (
+    Ixed (ix),
+    makeLenses,
+    over,
+    (&),
+    (+~),
+    (^?),
+    _head,
+ )
 import Data.Char (toUpper)
 import Data.List (find)
 import Data.Maybe (listToMaybe, mapMaybe)
+import Data.Vector (Vector)
+import qualified Data.Vector as Vec
+import Lib (firstRepeatOn)
 
 data Instruction = Nop Int | Jmp Int | Acc Int
     deriving (Show, Eq, Ord, Read)
 
 data Program = Program
-    { _instructions :: [Instruction]
+    { _instructions :: Vector Instruction
     , _ip :: Int
     , _acc :: Int
     }
     deriving (Show)
 makeLenses ''Program
+
+mkProgram :: [Instruction] -> Program
+mkProgram is = Program (Vec.fromList is) 0 0
 
 parseInput :: String -> [Instruction]
 parseInput = map (read . over _head toUpper) . lines . filter (/= '+')
@@ -27,8 +40,8 @@ run p@Program{..} = case _instructions ^? ix _ip of
     Just (Acc i) -> p & ip +~ 1 & acc +~ i
     Nothing -> p
 
-part1 :: Program -> Maybe Int
-part1 = fmap _acc . firstRepeatOn _ip . iterate run . run
+part1 :: [Instruction] -> Maybe Int
+part1 = fmap _acc . firstRepeatOn _ip . iterate run . mkProgram
 
 changeInstructions :: [Instruction] -> [Instruction] -> [[Instruction]]
 changeInstructions pre post =
@@ -42,15 +55,16 @@ changeInstructions pre post =
     changeInst (Nop i) = Jmp i
     changeInst n = n
 
-part2 :: Program -> Maybe Int
-part2 = fmap _acc . find ((== 647) . _ip) . take 2000 . iterate run
+part2 :: [Instruction] -> Maybe Int
+part2 = listToMaybe . mapMaybe check . changeInstructions []
+  where
+    check = fmap _acc . find ((== 647) . _ip) . take 300 . iterate run . mkProgram
 
 main :: IO ()
 main = do
     input <- parseInput <$> readFile "../data/day08.in"
-    let mkProgram is = Program is 0 0
-    print $ part1 $ mkProgram input
-    print $ listToMaybe $ mapMaybe (part2 . mkProgram) . changeInstructions [] $ input
+    print $ part1 input
+    print $ part2 input
 
 -- 1949
 -- 2092
