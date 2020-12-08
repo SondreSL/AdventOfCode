@@ -58,6 +58,7 @@ default-extensions:
 - QuasiQuotes
 - TypeApplications
 - ViewPatterns
+- RecordWildCards
   # - OverloadedStrings
 
 library:
