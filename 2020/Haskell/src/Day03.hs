@@ -12,7 +12,7 @@ type Tuple = (Int, Int)
 parseInput :: String -> Set Tuple
 parseInput = Set.map pointToTuple . Map.keysSet . parseAsciiMap f
   where
-    f '#' = Just True
+    f '#' = Just ()
     f _ = Nothing
 
 toboggan :: Set Tuple -> Tuple -> Int

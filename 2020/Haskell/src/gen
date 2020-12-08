@@ -1,11 +1,12 @@
 #!/bin/bash
 
-for i in $(seq -f "%02g" 02 25); do
+for i in $(seq -f "%02g" 09 25); do
 	echo "module Day$i where
 
 import Lib
 import Data.Maybe
 import Data.List.Extra
+import Text.ParserCombinators.Parsec
 
 parseInput = id
 

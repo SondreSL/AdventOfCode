@@ -3,6 +3,7 @@ module Day22 where
 import Lib
 import Data.Maybe
 import Data.List.Extra
+import Text.ParserCombinators.Parsec
 
 parseInput = id
 
