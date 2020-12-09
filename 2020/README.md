@@ -8,7 +8,7 @@
 * [x] Day 6:  [Haskell](Haskell/src/Day06.hs)
 * [x] Day 7:  [Haskell](Haskell/src/Day07.hs)
 * [x] Day 8:  [Haskell](Haskell/src/Day08.hs)
-* [ ] Day 9:  [Haskell](Haskell/src/Day09.hs)
+* [x] Day 9:  [Haskell](Haskell/src/Day09.hs)
 * [ ] Day 10: [Haskell](Haskell/src/Day10.hs)
 * [ ] Day 11: [Haskell](Haskell/src/Day11.hs)
 * [ ] Day 12: [Haskell](Haskell/src/Day12.hs)
