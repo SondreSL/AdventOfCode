@@ -5,35 +5,28 @@ import Data.Maybe ( listToMaybe )
 import Data.List.Extra ( inits, tails )
 import Control.Monad (replicateM, guard)
 
-parseInput :: String -> [Int]
-parseInput = linedNums
-
-part1 :: (Eq a, Num a) => Int -> [a] -> Maybe a
-part1 n input = listToMaybe $ do
-  t <- tails input
-  let xs = take n t
+part1 :: [Int] -> Int -> Maybe Int
+part1 input n = listToMaybe $ do
+  ts <- tails input
+  let xs = take n ts
       pairs = map sum $ replicateM 2 xs
-      y = t !! n
-  guard $ y `notElem` pairs
-  -- guard $ any (\x -> (y - x) `elem` xs) xs
-  pure y
+      target = ts !! n
+  guard $ target `notElem` pairs
+  pure target
 
-part2 :: (Num a, Ord a) => a -> [a] -> Maybe a
-part2 n input = listToMaybe $ do
+part2 :: [Int] -> Int -> Maybe Int
+part2 input n = listToMaybe $ do
   xs <- tails input
-  ys <- inits xs
-  guard $ sum ys == n
-  let mini = minimum ys
-      maxa = maximum ys
-  pure $ mini + maxa
-
+  let ts = last . takeWhile ((<= n) . sum) $ inits xs
+  guard $ sum ts == n
+  pure $ minimum ts + maximum ts
 
 main :: IO ()
 main = do
-  input <- parseInput <$> readFile "../data/day09.in"
-  let Just i = part1 25 input
+  input <- linedNums <$> readFile "../data/day09.in"
+  let i = part1 input 25
   print i
-  print $ part2 i input
+  print $ i >>= part2 input
 
 -- 2089807806
 -- 245848639
