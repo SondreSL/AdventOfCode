@@ -245,7 +245,7 @@ in a sequence of sorted numbers.
 
 ## Day 6
 
-**[Task text][aoc5] | [Code][day6]**
+**[Task text][aoc6] | [Code][day6]**
 
 [aoc6]: www.https://adventofcode.com/2020/day/6
 [day6]: src/Day06.hs
@@ -259,9 +259,97 @@ allowed me to submit my answers with a ~15 second gap once I had read the
 question.
 
 ## Day 7
+
+**[Task text][aoc07] | [Code][day07]**
+
+[aoc07]: www.https://adventofcode.com/2020/day/7
+[day07]: src/Day07.hs
+
+Fun puzzle, and the first with graphs this year.
+
+I'll show off only one aspect of haskell, namely how clean recursing a
+graph can be by utilizing `Maybe`.
+
+`findAll` will find all the vertices that can be reached from the list of
+vertices in `xs`, which are the children of the vertex we are interested in. It
+finds all the children of all the vertices in `xs` by calling `mapMaybe` with
+`Map.lookup` over the graph. As a result, the vertices with children are
+returned inside a `Just`, while those without children return `Nothing`.
+`mapMaybe` then automatically discard the `Nothing`s and unpacks the `Just`s.
+This way, we get all valid children, nothing crashes, and no explicit error
+checking has to happen.
+
+```haskell
+findAll :: Map Bag [(Int, Bag)] -> [(Int, Bag)] -> [(Int, Bag)]
+findAll input xs = xs ++ concatMap (findAll input) ys
+  where
+    ys = mapMaybe ((`Map.lookup` input) . snd) xs
+```
+
 ## Day 8
 ## Day 9
 ## Day 10
+
+**[Task text][aoc10] | [Code][day10]**
+
+[aoc10]: www.https://adventofcode.com/2020/day/10
+[day10]: src/Day10.hs
+
+Really fun problem today, requiring some dynamic programming (or
+mathematical savvy).
+
+I change the input during parsing to include both `0` and the maximum of the
+list plus three, as well as sorting it.
+
+Part 1, I zip the list with its own tail and find the difference of each
+resulting pair, and then use a frequency map to find the number of `1`s and
+`3`. It is probably overkill to use a frequency map here, as counting the `1`
+and `3` in the list is fine even if it requires two passes.
+
+```haskell
+part1 :: [Int] -> Maybe Int
+part1 = adapterProduct . freqs . map (uncurry subtract) . zipWithTail
+  where
+    adapterProduct input = (*) <$> Map.lookup 1 input <*> Map.lookup 3 input
+```
+
+Part 2 is where it gets interesting.
+
+My initial solution was a recursive function that first got the result back
+from the recursive call on the tail, hinting at a solution using a right fold
+of some sort. In the end, I found a pleasing solution using `para` from the
+`recursion-schemes` packages. `para` is a right fold that at each level
+provides access to both the result of the recursion on the tail of the current
+sublist, as well as the sublist itself. This makes it possible to determine how
+many elements of the list of results can be seen from the current position, and
+the sum of those elements is the value of the current position.
+
+It is really cool to only have to think about one level of the recursion at a
+time, and in general outsourcing recursion is pretty fun. The underlying
+machinery inside `Data.Functor.Foldable` takes care of translating the incoming
+list into its base functor, which is why I can patternmatch on `Nil` and `Cons`
+in `f`.
+
+```haskell
+part2 :: [Int] -> Maybe Integer
+part2 = listToMaybe . para f
+  where
+    f Nil = []
+    f (Cons x (xs, res)) = next : res
+      where
+        next = max 1 . sum . zipWith const res . takeWhile (<= x + 3) $ xs
+```
+
+The same thing can be done with a `foldr` where the function returns a tuple of
+the result and the current list, but this is exactly what `para` does for us.
+
+Another very cool way to effectively memoize results of common operations is to
+construct a lazy map. [Have a look at mstksg on github][mstksgday10] for an
+explanation. It seems to me an even cleaner approach to these kinds of dynamic
+programming problems.
+
+[mstksgday10]: https://github.com/mstksg/advent-of-code-2020/blob/master/reflections.md#day-10
+
 ## Day 11
 ## Day 12
 ## Day 13
