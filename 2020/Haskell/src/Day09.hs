@@ -20,7 +20,7 @@ part1 input n = listToMaybe $ do
 part2 :: [Int] -> Int -> Maybe Int
 part2 input n = listToMaybe $ do
   xs <- dropWhile ((< n) . sum) $ inits input
-  let Just candidate = listToMaybe $ dropWhile ((n <) . sum) $ tails xs
+  candidate <- take 1 . dropWhile ((n <) . sum) $ tails xs
   guard $ sum candidate == n
   pure $ minimum candidate + maximum candidate
 

@@ -5,8 +5,7 @@ import Control.Lens
 import Data.Char (toUpper)
 import Data.List (find)
 import Data.Maybe (mapMaybe)
-import Data.Vector (Vector)
-import qualified Data.Vector as Vec
+import Data.Vector (Vector, fromList)
 import Lib (firstRepeatOn)
 
 data Instruction = Nop Int | Jmp Int | Acc Int
@@ -27,7 +26,7 @@ mkProgram :: Instructions -> Program
 mkProgram is = Program is 0 0
 
 parseInput :: String -> Instructions
-parseInput = Vec.fromList . map (read . over _head toUpper) . lines . filter (/= '+')
+parseInput = fromList . map (read . over _head toUpper) . lines . filter (/= '+')
 
 run :: Program -> Program
 run p@Program{..} = case _instructions ^? ix _ip of
