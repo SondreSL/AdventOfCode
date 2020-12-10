@@ -15,7 +15,6 @@ import Linear ( V2(..) )
 import qualified Data.Set as Set
 import           Data.Set ( Set )
 import Control.Monad (guard, foldM)
--- import Data.Monoid ( Sum(Sum, getSum) )
 
 isPrime :: Integral a => a -> Bool
 isPrime n = null $ do
@@ -25,7 +24,6 @@ isPrime n = null $ do
 
 count :: Foldable t => (a -> Bool) -> t a -> Int
 count p = length . filter p . toList
--- count p = getSum . foldMap (bool (Sum 0) (Sum 1) . p)
 
 rotate :: Int -> [a] -> [a]
 rotate = drop <> take
