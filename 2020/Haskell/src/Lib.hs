@@ -34,6 +34,21 @@ zipWithTail = zip <*> tail
 zipWithTail' :: [a] -> [(a, a)]
 zipWithTail' = zip <*> rotate 1
 
+-- Functions that test for repetition
+
+-- More effective than firstRepeat, it does only need to hold two versions
+-- of the 'a' in memory at one time.
+fixedPoint :: Eq a => (a -> a) -> a -> Maybe a
+fixedPoint = fixedPointOn id
+
+fixedPointOn :: Eq b => (a -> b) -> (a -> a) -> a -> Maybe a
+fixedPointOn project f x = either Just (const Nothing) . foldM go x $ iterate f (f x)
+  where
+    go !x !x'
+     | project x == project x' = Left x
+     | otherwise = Right x'
+
+
 firstRepeat :: (Foldable t, Ord a) => t a -> Maybe a
 firstRepeat = firstRepeatOn id
 
@@ -44,6 +59,8 @@ firstRepeatOn project = either Just (const Nothing) . foldM f Set.empty
                in if Set.member var seen
                      then Left x
                      else Right $ Set.insert var seen
+
+--
 
 iterateMaybe :: (a -> Maybe a) -> a -> [a]
 iterateMaybe f x = x : case f x of
@@ -118,13 +135,7 @@ display project (minX, minY, maxX, maxY) =
 
 -- | All eight surrounding neighbours
 neighbours :: Point -> [Point]
-neighbours p0 =
-  [ p
-  | x <- [-1 .. 1]
-  , y <- [-1 .. 1]
-  , p <- [p0 + V2 x y]
-  , p /= p0
-  ]
+neighbours p0 = fmap (+ p0) . tail $ V2 <$> [0, 1, -1] <*> [0, 1, -1]
 
 -- | Neighbours left, right, above and below
 neighbours4 :: Point -> [Point]
