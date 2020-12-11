@@ -50,6 +50,9 @@ iterateMaybe f x = x : case f x of
                          Nothing -> []
                          Just v -> iterateMaybe f v
 
+toMapIndexed :: [a] -> Map Int a
+toMapIndexed = Map.fromList . zip [0..]
+
 -- | Find the lowest value where the predicate is satisfied within the
 -- given bounds.
 binaryMinSearch
