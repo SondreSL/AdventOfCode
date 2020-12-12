@@ -12,6 +12,7 @@ down = V2 0 (-1)
 left = V2 (-1) 0
 right = V2 1 0
 
-turnLeft, turnRight :: V2 Int -> V2 Int
+turnAround, turnLeft, turnRight :: V2 Int -> V2 Int
 turnLeft = perp
 turnRight = perp . perp . perp
+turnAround = negate
