@@ -3,18 +3,22 @@
 
 module Lib where
 
+import Control.Comonad.Store (ComonadStore(experiment))
 import Control.Lens
+import Control.Monad ((<=<), guard, foldM)
 import Data.Array (accumArray, elems)
 import Data.Bool (bool)
 import Data.Foldable ( Foldable(foldl', toList) )
-import Data.List.Extra (splitOn, chunksOf)
-import Data.Map (Map)
-import qualified Data.Map as Map
+import Data.List.Extra (tails, inits, splitOn, chunksOf, minimumBy, maximumBy)
 import Data.Semigroup (Max (Max, getMax), Min (Min, getMin))
 import Linear ( V2(..) )
+import Data.Function ( on )
+import qualified Data.List.NonEmpty as NE
+import qualified Data.Map as Map
+import           Data.Map (Map)
 import qualified Data.Set as Set
 import           Data.Set ( Set )
-import Control.Monad (guard, foldM)
+import Data.Maybe (listToMaybe)
 
 isPrime :: Integral a => a -> Bool
 isPrime n = null $ do
@@ -33,6 +37,24 @@ zipWithTail = zip <*> tail
 
 zipWithTail' :: [a] -> [(a, a)]
 zipWithTail' = zip <*> rotate 1
+
+-- Every combination of selecting one element
+-- and removing it from the list
+select :: [a] -> [(a, [a])]
+select xs = do
+  (is, t : ts) <- zip (inits xs) (tails xs)
+  pure (t, is ++ ts)
+
+combinations :: Int -> [a] -> [[a]]
+combinations 0 _ = []
+combinations 1 xs = map pure xs
+combinations n xs = do
+  t:ts <- tails xs
+  cs <- combinations (pred n) ts
+  pure $ t : cs
+
+safeHead :: [a] -> Maybe a
+safeHead = listToMaybe
 
 -- Functions that test for repetition
 
@@ -61,6 +83,53 @@ firstRepeatOn project = either Just (const Nothing) . foldM f Set.empty
                      else Right $ Set.insert var seen
 
 --
+
+-- Perturbations of a list, and max/min (key,value) from maps
+-- based on the value
+--
+-- Source: https://github.com/mstksg/advent-of-code-2020/blob/master/src/AOC/Common.hs
+--
+perturbations
+    :: Traversable f
+    => (a -> [a])
+    -> f a
+    -> [f a]
+perturbations = perturbationsBy traverse
+
+perturbationsBy
+    :: Conjoined p
+    => Over p (Bazaar p a a) s t a a
+    -> (a -> [a])
+    -> s
+    -> [t]
+perturbationsBy p f = experiment f <=< holesOf p
+
+-- | Get the key-value pair corresponding to the maximum value in the map
+maximumVal :: Ord b => Map a b -> Maybe (a, b)
+maximumVal = maximumValBy compare
+
+-- | Get the key-value pair corresponding to the maximum value in the map,
+-- with a custom comparing function.
+--
+-- > 'maximumVal' == 'maximumValBy' 'compare'
+maximumValBy :: (b -> b -> Ordering) -> Map a b -> Maybe (a, b)
+maximumValBy c = fmap (maximumBy (c `on` snd))
+               . NE.nonEmpty
+               . Map.toList
+
+-- | Get the key-value pair corresponding to the minimum value in the map,
+-- with a custom comparing function.
+--
+-- > 'minimumVal' == 'minimumValBy' 'compare'
+minimumValBy :: (b -> b -> Ordering) -> Map a b -> Maybe (a, b)
+minimumValBy c = fmap (minimumBy (c `on` snd))
+               . NE.nonEmpty
+               . Map.toList
+
+-- | Get the key-value pair corresponding to the minimum value in the map
+minimumVal :: Ord b => Map a b -> Maybe (a, b)
+minimumVal = minimumValBy compare
+---------------
 
 iterateMaybe :: (a -> Maybe a) -> a -> [a]
 iterateMaybe f x = x : case f x of
@@ -151,38 +220,11 @@ linedNums = map read . lines . filter (/= '+')
 commaNums :: String -> [Int]
 commaNums = map read . splitOn ","
 
--- Fold
+-- Inefficient version of unionFind
+-- Find the disjoint unions of a list by some f,
+-- that determines if an element should be in a set of elements or not.
 unionFind :: Ord a => (a -> Set a -> Bool) -> [a] -> Set (Set a)
 unionFind f = foldl' go Set.empty
   where
     go set x = let (same, diff) = Set.partition (f x) set
                 in Set.insert (Set.unions same <> Set.singleton x) diff
-
--- Some directional stuff, for moving in a certain facing
-data Dir = North | South | East | West
-  deriving (Ord, Eq, Show, Bounded, Enum)
-
--- North is like moving forward, so does not change direction
-instance Semigroup Dir where
-  (<>) North = id
-  (<>) East  = \case North -> East
-                     East  -> South
-                     South -> West
-                     West  -> North
-  (<>) South = \case North -> South
-                     East  -> West
-                     South -> North
-                     West  -> East
-  (<>) West  = \case North -> West
-                     East  -> North
-                     South -> East
-                     West  -> South
-
-instance Monoid Dir where
-  mempty = North
-
-dirPoint :: Dir -> Point
-dirPoint North = V2 0 1
-dirPoint South = V2 0 (-1)
-dirPoint West = V2 (-1) 0
-dirPoint East = V2 1 0
