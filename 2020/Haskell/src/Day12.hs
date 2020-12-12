@@ -19,24 +19,18 @@ move l ship c = ship & case c of
   (E, n  ) -> l  +~ n *^ right
   (S, n  ) -> l  +~ n *^ down
   (W, n  ) -> l  +~ n *^ left
-  (_, 180) -> _1 %~ negate
-  (L, 90 ) -> _1 %~ turnLeft
-  (R, 90 ) -> _1 %~ turnRight
-  (L, 270) -> _1 %~ turnRight
-  (R, 270) -> _1 %~ turnLeft
   (F, n  ) -> _2 +~ n *^ view _1 ship
+  (L, n  ) -> _1 %~ (!! mod (div n 90) 4) . iterate turnLeft
+  (R, n  ) -> _1 %~ (!! mod (div n 90) 4) . iterate turnRight
 
-part1 :: [(Command, Int)] -> Int
-part1 = mannDist (V2 0 0) . snd . foldl' (move _2) (right, origin)
-
-part2 :: [(Command, Int)] -> Int
-part2 = mannDist (V2 0 0) . snd . foldl' (move _1) (V2 10 1, origin)
+run :: Lens' (Point, Point) Point -> Point -> [(Command, Int)] -> Int
+run l start = mannDist origin . snd . foldl' (move l) (start, origin)
 
 main :: IO ()
 main = do
     input <- parseInput <$> readFile "../data/day12.in"
-    print $ part1 input
-    print $ part2 input
+    print $ run _2 right input
+    print $ run _1 (V2 10 1) input
 
 -- 1424
 -- 63447
