@@ -19,7 +19,7 @@ part2 = fst . foldl1' firstCommon
   where
     firstCommon (x, stepx) (y, stepy) = (next, lcm stepx stepy)
       where
-        next = iterateFind (\t -> (t + y) `mod` stepy == 0) (+ stepx) x
+        next = iterateFind ((== 0) . (`mod` stepy) . (+ y)) (+ stepx) x
 
 main :: IO ()
 main = do
