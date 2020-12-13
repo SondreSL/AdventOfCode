@@ -1,7 +1,7 @@
 module Day13 where
 
 import Data.List.Extra (foldl1', minimumOn, splitOn)
-import Data.Tuple.Extra (first)
+import Lib ( iterateFind )
 
 parseInput :: String -> (Integer, [(Integer, Integer)])
 parseInput = (\x -> (read $ head x, concatMap f . zip [0 ..] . splitOn "," $ x !! 1)) . lines
@@ -15,19 +15,11 @@ part1 n xs = uncurry (*) . minimumOn snd $ do
     pure (x, x - n `mod` x)
 
 part2 :: [(Integer, Integer)] -> Integer
-part2 =
-    fst
-        . foldl1' firstCommon
-        . uncurry (zipWith firstHit)
-        . first cycle
-        . splitAt 1
+part2 = fst . foldl1' firstCommon
   where
-    firstHit (x, a) (y, b) = (start, lcm a b)
-      where
-        start = head $ filter ((== 0) . (`mod` a)) . dropWhile (< 0) . map (subtract (y - x)) $ iterate (+ b) b
     firstCommon (x, stepx) (y, stepy) = (next, lcm stepx stepy)
       where
-        next = head $ filter ((== y) . (`mod` stepy)) $ iterate (+ stepx) x
+        next = iterateFind (\t -> (t + y) `mod` stepy == 0) (+ stepx) x
 
 main :: IO ()
 main = do
