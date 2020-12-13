@@ -160,19 +160,6 @@ iterateMaybe f x = x : case f x of
                          Nothing -> []
                          Just v -> iterateMaybe f v
 
--- Find the first element that satisfies the predicate
--- in the iterated stream
-iterateFind
-  :: (a -> Bool)
-  -> (a -> a)
-  -> a
-  -> a
-iterateFind pred f = go
-  where
-    go !x
-      | pred x = x
-      | otherwise = go (f x)
-
 toMapIndexed :: [a] -> Map Int a
 toMapIndexed = Map.fromList . zip [0..]
 

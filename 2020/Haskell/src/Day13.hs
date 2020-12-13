@@ -1,7 +1,6 @@
 module Day13 where
 
 import Data.List.Extra (foldl1', minimumOn, splitOn)
-import Lib ( iterateFind )
 
 parseInput :: String -> (Integer, [(Integer, Integer)])
 parseInput = (\x -> (read $ head x, concatMap f . zip [0 ..] . splitOn "," $ x !! 1)) . lines
@@ -19,7 +18,7 @@ part2 = fst . foldl1' firstCommon
   where
     firstCommon (x, stepx) (y, stepy) = (next, lcm stepx stepy)
       where
-        next = iterateFind ((== 0) . (`mod` stepy) . (+ y)) (+ stepx) x
+        next = until ((== 0) . (`mod` stepy) . (+ y)) (+ stepx) x
 
 main :: IO ()
 main = do
