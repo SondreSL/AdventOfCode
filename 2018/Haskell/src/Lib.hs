@@ -1,21 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TupleSections #-}
 
-module Lib (
-  freqs,
-  display,
-  findBounds,
-  parseAsciiMap,
-  asciiGrid,
-  Point,
-  neighbours,
-  neighbours4,
-  binaryMinSearch,
-  firstReapeat,
-  linedNums,
-  commaNums,
-  mannDist,unionFind)
-where
+module Lib where
 
 import Control.Lens
 import Data.Array (accumArray, elems)
@@ -35,6 +21,21 @@ firstReapeat = go Set.empty
     go !seen (x:xs) = if Set.member x seen
                         then go (Set.insert x seen) xs
                         else x
+
+skipLoop :: (Ord a) => (a -> (Int, a)) -> (Int -> Int -> a -> a) -> Int -> [a] -> a
+skipLoop normalize shift n xs = (!! extra) . map (shift loopShift looped) . drop loopN $ xs
+  where
+    (loopN, loopSize, loopShift) = findLoop normalize xs
+    (looped, extra) = (n - loopN) `divMod` loopSize
+
+findLoop :: Ord a => (a -> (Int, a)) -> [a] -> (Int, Int, Int) -- first loop, size of loop, shift
+findLoop normalize (x:xs) = go (Map.singleton x (0, 0)) 1 xs
+  where
+    go !seen !i (w:ws) = case Map.lookup w'Norm seen of
+                       Nothing -> go (Map.insert w'Norm (mn, i) seen) (i + 1) ws
+                       Just (seenMn, seenI) -> (seenI, i - seenI, mn - seenMn)
+      where
+        (mn, w'Norm) = normalize w
 
 -- | Find the lowest value where the predicate is satisfied within the
 -- given bounds.

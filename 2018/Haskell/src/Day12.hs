@@ -8,6 +8,7 @@ import Data.Finite (Finite, finites)
 import qualified Data.Map as M
 import Data.Set (Set)
 import qualified Data.Set as S
+import Lib
 
 type Ctx = Set (Finite 5)
 type Rules = Set Ctx
@@ -71,18 +72,14 @@ findLoop rules w0 = go (M.singleton w0 (0, 0)) 1 w0
 part1 :: Rules -> Set Int -> Int
 part1 rules = sum . (!! 20) . iterate (step rules)
 
-part2 :: Int -> Rules -> Set Int -> Int
-part2 n rules w = sum . goN extra . S.map (+ (loopShift * looped)) . goN loopN $ w
-  where
-    (loopN, loopSize, loopShift) = findLoop rules w
-    goN n w = (!! n) . iterate (step rules) $ w
-    (looped, extra) = (n - loopN) `divMod` loopSize
+part2 :: Rules -> Int -> Set Int -> Int
+part2 rules n = sum . skipLoop normalize (\sh lo x -> S.map (+ (sh * lo)) x) n . iterate (step rules)
 
 main :: IO ()
 main = do
   (start, rules) <- parseInput <$> readFile "../data/day12.in"
   print $ part1 rules start
-  print $ part2 50000000000 rules start
+  print $ part2 rules 50000000000 start
 
 
 -- 2823
