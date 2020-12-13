@@ -131,10 +131,47 @@ minimumVal :: Ord b => Map a b -> Maybe (a, b)
 minimumVal = minimumValBy compare
 ---------------
 
+-- Example shift-function, for a set
+-- (\sh lo x -> S.map (+ (sh * lo)) x)
+--
+skipLoop :: Ord a => (a -> (Int, a)) -> (Int -> Int -> a -> a) -> Int -> [a] -> a
+skipLoop normalize shift n xs = (!! extra) . map (shift loopShift looped) . drop loopN $ xs
+  where
+    (loopN, loopSize, loopShift) = findLoop normalize xs
+    (looped, extra) = (n - loopN) `divMod` loopSize
+
+findLoop :: Ord a => (a -> (Int, a)) -> [a] -> (Int, Int, Int) -- first loop, size of loop, shift
+findLoop normalize (x:xs) = go (Map.singleton x (0, 0)) 1 xs
+  where
+    go !seen !i (w:ws) = case Map.lookup w'Norm seen of
+                       Nothing -> go (Map.insert w'Norm (mn, i) seen) (i + 1) ws
+                       Just (seenMn, seenI) -> (seenI, i - seenI, mn - seenMn)
+      where
+        (mn, w'Norm) = normalize w
+
+
+-- Iterate a function n times
+goN :: Int -> (a -> a) -> a -> a
+goN n f = (!! n) . iterate f
+
+-- Iterate a function until it returns Nothing.
 iterateMaybe :: (a -> Maybe a) -> a -> [a]
 iterateMaybe f x = x : case f x of
                          Nothing -> []
                          Just v -> iterateMaybe f v
+
+-- Find the first element that satisfies the predicate
+-- in the iterated stream
+iterateFind
+  :: (a -> Bool)
+  -> (a -> a)
+  -> a
+  -> a
+iterateFind pred f = go
+  where
+    go !x
+      | pred x = x
+      | otherwise = go (f x)
 
 toMapIndexed :: [a] -> Map Int a
 toMapIndexed = Map.fromList . zip [0..]
