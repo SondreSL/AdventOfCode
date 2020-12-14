@@ -24,7 +24,7 @@ parseInput :: String -> [Instruction]
 parseInput = either (error . show) id . traverse (parse p "") . lines
   where
     p = try mask <|> mem
-    mask = SetMask <$> (string "mask = " *> many1 (oneOf "X10"))
+    mask = SetMask . reverse <$> (string "mask = " *> many1 (oneOf "X10"))
     mem = SetMem <$> (string "mem[" *> (read <$> many1 digit) <* string "] = ") <*> (read <$> many1 digit)
 
 applyMask :: ((Int, Char) -> [Int]) -> String -> Int -> [Int]
@@ -34,7 +34,7 @@ applyMask f m n =
         $ zip (take 36 . (++ repeat 0) . reverse $ digits 2 n) m
 
 run :: (Memory -> Int -> Int -> IntMap Int) -> Memory -> Instruction -> Memory
-run _ memory (SetMask str   ) = memory & mask .~ reverse str
+run _ memory (SetMask str   ) = memory & mask .~ str
 run f memory (SetMem loc val) = memory & mem .~ f memory loc val
 
 part1 :: [Instruction] -> Int
