@@ -1,10 +1,11 @@
 module Day14 where
 
-import Control.Lens
-import Data.Digits
+import Control.Lens ( (&), view, makePrisms, (.~), makeLenses )
+import Data.Digits ( digits, unDigits )
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
+    ( digit, oneOf, string, many1, (<|>), parse, try )
 
 data Instruction
     = SetMask String
@@ -26,40 +27,35 @@ parseInput = either (error . show) id . traverse (parse p "") . lines
     mask = SetMask <$> (string "mask = " *> many1 (oneOf "X10"))
     mem = SetMem <$> (string "mem[" *> (read <$> many1 digit) <* string "] = ") <*> (read <$> many1 digit)
 
-zipMask :: String -> [Int] -> [Int]
-zipMask = zipWith f
-  where
-    f 'X' a = a
-    f '0' _ = 0
-    f '1' _ = 1
+applyMask :: ((Int, Char) -> [Int]) -> String -> Int -> [Int]
+applyMask f m n =
+    map (unDigits 2 . reverse)
+        . traverse f
+        $ zip (take 36 . (++ repeat 0) . reverse $ digits 2 n) m
 
-modifyMask :: String -> Int -> [Int]
-modifyMask str num = map (unDigits 2 . reverse) . traverse f $ zip (take 36 . (++ repeat 0) . reverse $ digits 2 num) str
-  where
-    f (n, '0') = [n]
-    f (_, '1') = [1]
-    f (_, 'X') = [0, 1]
-
-applyMask :: String -> Int -> Int
-applyMask m = unDigits 2 . reverse . zipMask m . take 36 . (++ repeat 0) . reverse . digits 2
-
-run :: Memory -> Instruction -> Memory
-run memory (SetMask str) = memory & mask .~ reverse str
-run memory (SetMem loc val) =
-    let val' = applyMask (view mask memory) val
-     in memory & mem %~ Map.insert loc val'
-
-run2 :: Memory -> Instruction -> Memory
-run2 memory (SetMask str) = memory & mask .~ reverse str
-run2 memory (SetMem loc val) =
-    let locs = modifyMask (view mask memory) loc
-     in memory & mem .~ foldl (\acc x -> Map.insert x val acc) (view mem memory) locs
+run :: (Memory -> Int -> Int -> Map Int Int) -> Memory -> Instruction -> Memory
+run _ memory (SetMask str) = memory & mask .~ reverse str
+run f memory (SetMem loc val) = memory & mem .~ f memory loc val
 
 part1 :: [Instruction] -> Int
-part1 = sum . view mem . foldl run (Memory Map.empty "")
+part1 = sum . view mem . foldl (run f) (Memory Map.empty "")
+  where
+    f (Memory me ma) loc val =
+      let val' = head $ applyMask maskOp ma val
+       in Map.insert loc val' me
+    maskOp (a, 'X') = [a]
+    maskOp (_, '0') = [0]
+    maskOp (_, '1') = [1]
 
 part2 :: [Instruction] -> Int
-part2 = sum . view mem . foldl run2 (Memory Map.empty "")
+part2 = sum . view mem . foldl (run f) (Memory Map.empty "")
+  where
+    f (Memory me ma) loc val =
+      let locs = applyMask maskOp ma loc
+       in foldl (\acc l -> Map.insert l val acc) me locs
+    maskOp (n, '0') = [n]
+    maskOp (_, '1') = [1]
+    maskOp (_, 'X') = [0, 1]
 
 main :: IO ()
 main = do
