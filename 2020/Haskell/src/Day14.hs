@@ -2,8 +2,8 @@ module Day14 where
 
 import Control.Lens ( (&), view, makePrisms, (.~), makeLenses )
 import Data.Digits ( digits, unDigits )
-import Data.Map (Map)
-import qualified Data.Map as Map
+import Data.IntMap (IntMap)
+import qualified Data.IntMap as Map
 import Text.ParserCombinators.Parsec
     ( digit, oneOf, string, many1, (<|>), parse, try )
 
@@ -14,7 +14,7 @@ data Instruction
 makePrisms ''Instruction
 
 data Memory = Memory
-    { _mem :: Map Int Int
+    { _mem :: IntMap Int
     , _mask :: String
     }
     deriving (Show)
@@ -33,8 +33,8 @@ applyMask f m n =
         . traverse f
         $ zip (take 36 . (++ repeat 0) . reverse $ digits 2 n) m
 
-run :: (Memory -> Int -> Int -> Map Int Int) -> Memory -> Instruction -> Memory
-run _ memory (SetMask str) = memory & mask .~ reverse str
+run :: (Memory -> Int -> Int -> IntMap Int) -> Memory -> Instruction -> Memory
+run _ memory (SetMask str   ) = memory & mask .~ reverse str
 run f memory (SetMem loc val) = memory & mem .~ f memory loc val
 
 part1 :: [Instruction] -> Int
