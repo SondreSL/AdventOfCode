@@ -1,33 +1,56 @@
 module Day15 where
 
+import qualified Data.Vector.Mutable as MV
+import Control.Monad.ST ( ST, runST )
+
 import Data.IntMap (IntMap)
-import qualified Data.IntMap as Map
+import qualified Data.IntMap.Strict as Map
+import Control.Monad (foldM)
 
-play :: IntMap (Either (Int, Int) Int) -> Int -> Int -> [Int]
-play seen turn lastSpoken =
-    case Map.lookup lastSpoken seen of
-        Just (Right _) -> 0 : play (Map.insertWith f 0 (Right turn) seen) (succ turn) 0
-        Just (Left (prev, old)) ->
-            let diff' = prev - old
-             in diff' : play (Map.insertWith f diff' (Right turn) seen) (succ turn) diff'
+run :: Int -> [Int] -> ST s Int
+run target xs = do
+  vec <- MV.new (target + 1)
+  MV.set vec 0
+  vec <- foldM initial vec (zip [1..] (init xs))
+  runMut vec (last xs) 6
+    where
+      initial vec (i, x) = do
+        MV.write vec x i
+        pure vec
+      runMut vec current turn = do
+        prev <- MV.read vec current
+        let next = if prev == 0
+                     then 0
+                     else turn - prev
+        MV.write vec current turn
+        if turn == target
+           then pure current
+           else runMut vec next (turn + 1)
+
+play :: Int -> IntMap Int -> Int -> Int -> Int
+play target seen turn current = go seen turn current
   where
-    f (Right new) (Right old) = Left (new, old)
-    f (Right new) (Left (old, _)) = Left (new, old)
+    go seen !turn !current
+      | turn == target = current
+      | otherwise =
+          go (Map.insert current turn seen)
+             (succ turn)
+             (case Map.lookup current seen of
+                Nothing -> 0
+                Just prev -> turn - prev
+             )
 
-initialize :: [Int] -> [Int]
-initialize xs = (xs ++) $ play (Map.fromList (zip xs (map pure [1 ..]))) (succ (length xs)) (last xs)
-
-part1 :: [Int] -> Int
-part1 = (!! 2019) . initialize
-
-part2 :: [Int] -> Int
-part2 = (!! 29999999) . initialize
+initialize :: Int -> [Int] -> Int
+initialize n xs = play n (Map.fromList (zip (init xs) [1 ..])) (length xs) (last xs)
 
 main :: IO ()
 main = do
     let input = [1, 20, 11, 6, 12, 0]
-    print $ part1 input
-    print $ part2 input
+    -- print $ initialize 2020 input
+    -- print $ initialize 30000000 input
+
+    print $ runST (run 2020 input)
+    print $ runST (run 30000000 input)
 
 -- 1085
 -- 10652
