@@ -45,6 +45,7 @@ dependencies:
 - lens-regex-pcre
 - foldl
 - comonad
+- arithmoi
 
 default-extensions:
 - BangPatterns
