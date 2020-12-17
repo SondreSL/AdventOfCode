@@ -50,6 +50,7 @@ createCandidates input = Map.unionsWith Set.intersection . map (isCand input)
                     then Set.singleton name
                     else Set.empty) xs
 
+determineRules :: Map Int (Set Rule) -> [(Rule, Int)]
 determineRules (Map.toList -> nearby) =
   let xs = sortOn (length . snd) nearby
    in map (swap . second Set.findMin) $ removeDetermined xs
