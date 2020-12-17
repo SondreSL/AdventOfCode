@@ -2,7 +2,7 @@ module Day17 where
 
 import Lib ( count, parseAsciiMap )
 import Data.Maybe ( mapMaybe )
-import Linear ( V2(V2), V3(..), V4(..) )
+import Linear ( V2(..), V3(..), V4(..) )
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import           Data.Set   ( Set )
@@ -14,9 +14,10 @@ parseInput = Map.keysSet . parseAsciiMap f
     f _ = Nothing
 
 step :: Ord a => (a -> [a]) -> Set a -> Set a
-step genNearby input = Set.fromList . mapMaybe f . concatMap genNearby $ Set.toList input
+step genNearby input = Set.fromList . mapMaybe f . Set.toList $ candidates
   where
-    f p = case (p `Set.member` input, Lib.count (`Set.member` input) (tail $ genNearby p)) of
+    candidates = Set.fromList (concatMap genNearby input) `Set.union` input
+    f p = case (p `Set.member` input, Lib.count (`Set.member` input) (genNearby p)) of
             (True, 2) -> Just p
             (True, 3) -> Just p
             (False, 3) -> Just p
@@ -25,12 +26,12 @@ step genNearby input = Set.fromList . mapMaybe f . concatMap genNearby $ Set.toL
 part1 :: Set (V3 Int) -> Int
 part1 = Set.size . (!! 6) . iterate (step allNei)
   where
-    allNei p = (p +) <$> (V3 <$> [0,1,-1] <*> [0,1,-1] <*> [0,1,-1])
+    allNei p = tail $ (p +) <$> (V3 <$> [0,1,-1] <*> [0,1,-1] <*> [0,1,-1])
 
 part2 :: Set (V4 Int) -> Int
-part2 = Set.size . (!! 6) . iterate (step allNei4)
+part2 = Set.size . (!! 6) . iterate (step allNei)
   where
-    allNei4 p = (p +) <$> (V4 <$> [0,1,-1] <*> [0,1,-1] <*> [0,1,-1] <*> [0,1,-1])
+    allNei p = tail $ (p +) <$> (V4 <$> [0,1,-1] <*> [0,1,-1] <*> [0,1,-1] <*> [0,1,-1])
 
 main :: IO ()
 main = do
