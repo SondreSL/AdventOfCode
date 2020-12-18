@@ -1,45 +1,39 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Day18 where
 
-import Text.ParserCombinators.Parsec
-    ( char, digit, oneOf, between, many1, (<|>), parse )
+import Text.Parsec
+    ( char, digit, string, between, many1, (<?>), (<|>), parse, Parsec )
+import Text.Parsec.Expr
+    ( buildExpressionParser, Assoc(AssocLeft), Operator(Infix) )
+import Control.Lens (Identity)
 
-part1 :: String -> Int
-part1 = sum . either (error . show) id . traverse (parse parseExp "") . lines . filter (/= ' ')
-  where
-    parseExp = parseFactor >>= loop
-      where termSuffix t1 = do
-              op <- oneOf "+*"
-              t2 <- parseFactor
-              case op of
-                '+' -> loop (t1 + t2)
-                '*' -> loop (t1 * t2)
-            loop t = termSuffix t <|> pure t
-    parseFactor = parseConst <|> parseParen
-    parseParen = between (char '(') (char ')') parseExp
-    parseConst = read <$> many1 digit
+type Op = Operator String () Identity Int
 
-part2 :: String -> Int
-part2 = sum . either (error . show) id . traverse (parse parseExp "") . lines . filter (/= ' ')
+expr1 :: Parsec String () Int
+expr1 = buildExpressionParser table1 term1 <?> "expression"
   where
-    parseExp = parseTerm >>= loop
-      where termSuffix t1 = do
-              t2 <- oneOf "*" *> parseTerm
-              loop (t1 * t2)
-            loop t = termSuffix t <|> pure t
-    parseTerm = parseFactor >>= loop
-      where factorSuffix x = do
-              y <- oneOf "+" *> parseFactor
-              loop (x + y)
-            loop t = factorSuffix t <|> pure t
-    parseFactor = parseConst <|> parseParen
-    parseParen = between (char '(') (char ')') parseExp
-    parseConst = read <$> many1 digit
+    term1 = between (char '(') (char ')') expr1 <|> (read <$> many1 digit) <?> "term"
+    table1 = [ [ binary  "*" (*) AssocLeft, binary  "+" (+) AssocLeft ] ]
+
+expr2 :: Parsec String () Int
+expr2 = buildExpressionParser table2 term2 <?> "expression"
+  where
+    term2 = between (char '(') (char ')') expr2 <|> (read <$> many1 digit) <?> "term"
+    table2 = [ [ binary  "+" (+) AssocLeft ]
+             , [ binary  "*" (*) AssocLeft ]
+             ]
+
+binary :: String -> (Int -> Int -> Int) -> Assoc -> Operator String () Identity Int
+binary name f = Infix  (f <$ string name)
+
+run :: Parsec String () Int -> [String] -> Int
+run e = sum . either (error . show) id . traverse (parse e "")
 
 main :: IO ()
 main = do
-  input <- readFile "../data/day18.in"
-  print $ part1 input
-  print $ part2 input
+  input <- lines . filter (/= ' ') <$> readFile "../data/day18.in"
+  print $ run expr1 input
+  print $ run expr2 input
 
 -- 8929569623593
 -- 231235959382961
