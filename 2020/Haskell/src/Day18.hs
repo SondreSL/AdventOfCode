@@ -8,14 +8,15 @@ import Text.Parsec.Expr
 import Control.Lens (Identity)
 
 type Op = Operator String () Identity Int
+type Parser = Parsec String ()
 
-expr1 :: Parsec String () Int
+expr1 :: Parser Int
 expr1 = buildExpressionParser table1 term1 <?> "expression"
   where
     term1 = between (char '(') (char ')') expr1 <|> (read <$> many1 digit) <?> "term"
     table1 = [ [ binary  "*" (*) AssocLeft, binary  "+" (+) AssocLeft ] ]
 
-expr2 :: Parsec String () Int
+expr2 :: Parser Int
 expr2 = buildExpressionParser table2 term2 <?> "expression"
   where
     term2 = between (char '(') (char ')') expr2 <|> (read <$> many1 digit) <?> "term"
@@ -23,7 +24,7 @@ expr2 = buildExpressionParser table2 term2 <?> "expression"
              , [ binary  "*" (*) AssocLeft ]
              ]
 
-binary :: String -> (Int -> Int -> Int) -> Assoc -> Operator String () Identity Int
+binary :: String -> (Int -> Int -> Int) -> Assoc -> Op
 binary name f = Infix  (f <$ string name)
 
 run :: Parsec String () Int -> [String] -> Int
