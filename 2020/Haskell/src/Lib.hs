@@ -9,7 +9,7 @@ import Control.Monad ((<=<), guard, foldM)
 import Data.Array (accumArray, elems)
 import Data.Bool (bool)
 import Data.Foldable ( Foldable(foldl', toList) )
-import Data.List.Extra (tails, inits, splitOn, chunksOf, minimumBy, maximumBy)
+import Data.List.Extra (transpose, tails, inits, splitOn, chunksOf, minimumBy, maximumBy)
 import Data.Semigroup (Max (Max, getMax), Min (Min, getMin))
 import Linear ( V2(..) )
 import Data.Function ( on )
@@ -28,6 +28,13 @@ isPrime n = null $ do
 
 count :: Foldable t => (a -> Bool) -> t a -> Int
 count p = length . filter p . toList
+
+-- To get _all_ diagonals, do this once on the list and on the reversed list
+diagonals :: [[a]] -> [[a]]
+diagonals xs = lower ++ upper
+  where
+    upper = transpose $ zipWith drop [0..] xs
+    lower = reverse $ transpose $ map reverse $ zipWith take [0..] xs
 
 rotate :: Int -> [a] -> [a]
 rotate = drop <> take
@@ -55,6 +62,12 @@ combinations n xs = do
 
 safeHead :: [a] -> Maybe a
 safeHead = listToMaybe
+
+tuple :: [a] -> (a, a)
+tuple [a, b] = (a, b)
+
+tuple3 :: [a] -> (a, a, a)
+tuple3 [a, b, c] = (a, b, c)
 
 -- Functions that test for repetition
 
