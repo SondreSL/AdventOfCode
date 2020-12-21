@@ -1,23 +1,23 @@
 module Day20 where
 
-import Control.Lens ( view )
 import Control.Monad.State
     ( guard, MonadState(put, get), MonadTrans(lift), StateT, evalStateT )
 import Data.Bifunctor ( Bifunctor(first) )
-import Data.List.Extra ( transpose, chunksOf, splitOn )
+import Data.List.Extra ( transpose, splitOn)
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Maybe ( listToMaybe, mapMaybe )
+import Data.Maybe (listToMaybe, mapMaybe)
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Lib
-    ( count, neighbours4, parseAsciiMap, select, tuple, Point )
-import Linear (R1 (_x), V2 (V2))
+    ( neighbours4, select, tuple, Point )
+import Linear (V2 (V2), perp)
 import Text.ParserCombinators.Parsec
   (digit, many1, oneOf, parse, string)
 
 type Tile = (Int, [[Bool]])
 
+-- Parsing
 parseInput :: [Char] -> [Tile]
 parseInput = either (error . show) id . traverse (parse parseTile "") . splitOn "\n\n"
   where
@@ -28,6 +28,7 @@ parseInput = either (error . show) id . traverse (parse parseTile "") . splitOn 
         tiles <- map (map f) . lines <$> many1 (oneOf ".#\n")
         pure (read idN, tiles)
 
+-- For part 1
 findMatches :: [Tile] -> Maybe (Map Point Tile)
 findMatches xs = listToMaybe $ evalStateT (f size (tail xs)) (Map.singleton (V2 0 0) (head xs))
   where
@@ -47,9 +48,11 @@ match _ (i, t) = do
     t' <- lift $ permute t
     guard $ all (doesFit p (i, t')) ns
     put $ Map.insert p (i, t') ms
-
-possiblePositions :: Map Point Tile -> [Point]
-possiblePositions xs = filter (`Map.notMember` xs) . concat . Set.toList . Set.map neighbours4 . Map.keysSet $ xs
+      where
+        permute t = take 4 (iterate rot90 t) ++ take 4 (iterate rot90 revved)
+          where
+            rot90 = map reverse . transpose
+            revved = map reverse t
 
 doesFit :: Point -> Tile -> (Point, Tile) -> Bool
 doesFit p (_, t) (neigh, (_, n)) =
@@ -63,77 +66,55 @@ doesFit p (_, t) (neigh, (_, n)) =
         -- neighbour is left
         V2 1 0 -> map last t == map head n
 
-permute :: [[a]] -> [[[a]]]
-permute t =
-    [ t
-    , rot90 t
-    , rot90 . rot90 $ t
-    , rot90 . rot90 . rot90 $ t
-    , revved
-    , rot90 revved
-    , rot90 . rot90 $ revved
-    , rot90 . rot90 . rot90 $ revved
-    ]
-  where
-    rot90 = map reverse . transpose
-    revved = map reverse t
+possiblePositions :: Map Point Tile -> [Point]
+possiblePositions xs = filter (`Map.notMember` xs) . concat . Set.toList . Set.map neighbours4 . Map.keysSet $ xs
 
-toImage :: Map Point (Int, [[Bool]]) -> [Char]
-toImage xs =
-    unlines
-        . map (map toChar)
-        . concatMap merge
-        . transpose
-        . reverse
-        . chunksOf side
-        . map (reverse . dropEdges . snd)
-        . Map.toList
-        $ Map.map snd xs
+-- For part 2
+toCoords :: Map Point Tile -> Set Point
+toCoords = Set.unions . map Set.fromList . Map.elems . Map.mapWithKey tileCoords
   where
-    side = round $ sqrt (fromIntegral $ length xs)
-    merge xss
-        | all null xss = []
-        | otherwise = concatMap head xss : merge (map tail xss)
-    toChar False = '.'
-    toChar True = '#'
-    dropEdges = tail . init . map (init . tail)
+    tileCoords p (_, bs) = do
+      (y, rows) <- zip [7,6..] . tail . init $ bs
+      (x, cs) <- zip [7,6..] . tail . init $ rows
+      guard cs
+      pure $ V2 x y + (p * V2 8 8)
 
-findMonster :: [Char] -> Int
-findMonster xs = count (== '#') xs - Set.size points
+locateMonster :: Set Point -> Int
+locateMonster xs = Set.size xs - Set.size points
   where
-    points = Set.unions $ concatMap removeSeamonster (permute . lines $ xs)
-    removeSeamonster ps = mapMaybe isMonster monsters
+    ps = rotateCoords xs
+    points = Set.unions $ concatMap removeSeamonster ps
+    removeSeamonster ps = mapMaybe (isMonster ps) monsters
+    offsets = map tuple $ sequence [[0 .. 8 * 12], [0 .. 8 * 12]]
+    monsters = map (\(x, y) -> Set.map (+ V2 x y) seamonster) offsets
+    isMonster coords xs =
+        if Set.isSubsetOf xs coords
+            then Just xs
+            else Nothing
+    rotateCoords xs = take 4 (iterate rot90 xs) ++ take 4 (iterate rot90 reversed)
       where
-        coords = parseToSet $ unlines ps
-        size = maximum . map (view _x) $ Set.toList coords
-        offsets = map tuple $ sequence [[0 .. size], [0 .. size]]
-        monsters = map (\(x, y) -> Set.map (+ V2 x y) seamonster) offsets
-        isMonster xs =
-            if Set.isSubsetOf xs coords
-                then Just xs
-                else Nothing
-        parseToSet = Map.keysSet . parseAsciiMap f
-          where
-            f '#' = Just ()
-            f _ = Nothing
+        rot90 = Set.map (subtract (V2 (-8*12) 0) . perp)
+        reversed = Set.map (\(V2 x y) -> V2 (8*12 - x) y) xs
+
+normalize :: (Num k, Ord k) => Map k a -> Map k a
+normalize xs = Map.fromList . map (first (subtract minKey)) $ Map.toList xs
+  where
+    minKey = minimum $ Map.keys xs
 
 part1 :: Map Point Tile -> Maybe Int
 part1 = cornerProd . normalize
   where
     cornerProd xs = product . map fst <$> traverse (`Map.lookup` xs) [V2 0 0, V2 0 11, V2 11 11, V2 11 0]
-    normalize xs = Map.fromList . map (first (subtract minKey)) $ Map.toList xs
-      where
-        minKey = minimum $ Map.keys xs
 
 part2 :: Map Point Tile -> Int
-part2 = findMonster . toImage
+part2 = locateMonster . toCoords . normalize
 
 main :: IO ()
 main = do
     input <- parseInput <$> readFile "../data/day20.in"
-    let Just p1 = findMatches input
-    print $ part1 p1
-    print $ part2 p1
+    let p1 = findMatches input
+    print $ part1 =<< p1
+    print $ part2 <$> p1
 
 -- 51214443014783
 -- 2065
