@@ -20,7 +20,7 @@
 * [x] Day 18: [Haskell](Haskell/src/Day18.hs)
 * [x] Day 19: [Haskell](Haskell/src/Day19.hs)
 * [x] Day 20: [Haskell](Haskell/src/Day20.hs)
-* [ ] Day 21: [Haskell](Haskell/src/Day21.hs)
+* [x] Day 21: [Haskell](Haskell/src/Day21.hs)
 * [ ] Day 22: [Haskell](Haskell/src/Day22.hs)
 * [ ] Day 23: [Haskell](Haskell/src/Day23.hs)
 * [ ] Day 24: [Haskell](Haskell/src/Day24.hs)
