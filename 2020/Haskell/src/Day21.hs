@@ -13,7 +13,7 @@ import Lib (count)
 import Text.ParserCombinators.Parsec
   (between, char, letter, many1, parse, sepBy, sepEndBy, space, string)
 
-parseInput :: String -> [([[Char]], [[Char]])]
+parseInput :: String -> [([String], [String])]
 parseInput = either (error . show) id . traverse (parse p "") . lines
   where
     p =
@@ -34,7 +34,7 @@ part1 input = count (`Set.notMember` cs) (concatMap fst input)
   where
     cs = Set.unions . Map.elems $ candidates input
 
-part2 :: [([String], [String])] -> Maybe [Char]
+part2 :: [([String], [String])] -> Maybe String
 part2 input = intercalate "," . map snd . sortOn fst <$> res
   where
     cs = Map.toList $ candidates input
