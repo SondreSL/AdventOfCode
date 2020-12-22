@@ -1,0 +1,168 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 7bc5ae18408535ef3ff4e045710d00206b27a40bf62db9a5fadfb8b21237502a
+
+name:           aoc2019
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/aoc2019#readme>
+homepage:       https://github.com/githubuser/aoc2019#readme
+bug-reports:    https://github.com/githubuser/aoc2019/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2020 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/aoc2019
+
+library
+  exposed-modules:
+      Day01
+      Day02
+      Day03
+      Day04
+      Day05
+      Day06
+      Day07
+      Day08
+      Day09
+      Day10
+      Day11
+      Day12
+      Day13
+      Day14
+      Day15
+      Day16
+      Day17
+      Day18
+      Day19
+      Day20
+      Day21
+      Day22
+      Day23
+      Day24
+      Day25
+      Intcode
+      Lib
+      Template
+      Utilities
+  other-modules:
+      Paths_aoc2019
+  hs-source-dirs:
+      src
+  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor DeriveTraversable DeriveFoldable TemplateHaskell RankNTypes DataKinds QuasiQuotes TypeApplications ViewPatterns RecordWildCards
+  build-depends:
+      MissingH
+    , arithmoi
+    , array
+    , base >=4.7 && <5
+    , bytestring
+    , comonad
+    , containers
+    , deepseq
+    , digits
+    , dlist
+    , extra
+    , finite-typelits
+    , foldl
+    , free-algebras
+    , groups
+    , lens
+    , lens-regex-pcre
+    , linear
+    , mtl
+    , parsec
+    , pointedlist
+    , recursion-schemes
+    , relude
+    , sbv
+    , text
+    , vector
+  default-language: Haskell2010
+
+executable aoc2019-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_aoc2019
+  hs-source-dirs:
+      app
+  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor DeriveTraversable DeriveFoldable TemplateHaskell RankNTypes DataKinds QuasiQuotes TypeApplications ViewPatterns RecordWildCards
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      MissingH
+    , aoc2019
+    , arithmoi
+    , array
+    , base >=4.7 && <5
+    , bytestring
+    , comonad
+    , containers
+    , deepseq
+    , digits
+    , dlist
+    , extra
+    , finite-typelits
+    , foldl
+    , free-algebras
+    , groups
+    , lens
+    , lens-regex-pcre
+    , linear
+    , mtl
+    , parsec
+    , pointedlist
+    , recursion-schemes
+    , relude
+    , sbv
+    , text
+    , vector
+  default-language: Haskell2010
+
+test-suite aoc2019-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_aoc2019
+  hs-source-dirs:
+      test
+  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor DeriveTraversable DeriveFoldable TemplateHaskell RankNTypes DataKinds QuasiQuotes TypeApplications ViewPatterns RecordWildCards
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      MissingH
+    , aoc2019
+    , arithmoi
+    , array
+    , base >=4.7 && <5
+    , bytestring
+    , comonad
+    , containers
+    , deepseq
+    , digits
+    , dlist
+    , extra
+    , finite-typelits
+    , foldl
+    , free-algebras
+    , groups
+    , lens
+    , lens-regex-pcre
+    , linear
+    , mtl
+    , parsec
+    , pointedlist
+    , recursion-schemes
+    , relude
+    , sbv
+    , text
+    , vector
+  default-language: Haskell2010

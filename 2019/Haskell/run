@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ghcid -c "stack ghci --main-is aoc2019:exe:aoc2019-exe" --test="Day${1}.main"
