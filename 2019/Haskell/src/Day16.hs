@@ -1,3 +1,5 @@
+module Day16 where
+
 import Data.List
 import Data.Char
 
@@ -25,7 +27,7 @@ solveA :: [Int] -> [Int]
 solveA base = take 8 . (!! 100) . scanl phase base $ repeat (pattern [0,1,0,-1])
 
 solveB :: [Int] -> [Int]
-solveB base = 
+solveB base =
   let offset = foldl ((+) . (*10)) 0 $ take 7 base
       rest = drop offset (concat $ replicate 10000 base)
    in take 8 . (!! 100) $ iterate rev rest
@@ -37,4 +39,4 @@ main = do
   putStrLn $ concatMap show $ solveB contents
 
 -- 76795888
--- 84024125 
+-- 84024125

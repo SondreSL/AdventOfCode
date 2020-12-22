@@ -1,3 +1,5 @@
+module Day10 where
+
 import Prelude hiding (lookup)
 import Data.List.Extra hiding (lookup)
 import Data.Maybe
@@ -15,7 +17,7 @@ coords input = M.map (\_ -> 0) . M.fromList $ go 0 input
         go a (x:xs) = filter ((/='.') . snd) $ (map (\(col, ch) -> ((col, a), ch)) (zip [0..] x)) ++ go (a + 1) xs
 
 angle :: Asteroid -> Asteroid -> (Int, Int)
-angle (x, y) (a, b) = 
+angle (x, y) (a, b) =
   let (dx, dy) = (a - x, b - y)
       gd = gcd dx dy
    in (div dx gd, div dy gd)

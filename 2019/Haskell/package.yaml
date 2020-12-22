@@ -46,6 +46,8 @@ dependencies:
 - foldl
 - comonad
 - arithmoi
+- pqueue
+- modular
 
 default-extensions:
 - BangPatterns

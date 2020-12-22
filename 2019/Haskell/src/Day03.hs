@@ -1,3 +1,5 @@
+module Day03 where
+
 import Prelude hiding (foldr)
 import Data.List hiding (insert, foldr)
 import Control.Arrow  ((&&&))
@@ -10,7 +12,7 @@ strToData = map (map f . words) . lines
   where f = head &&& read . tail
 
 compute :: [(Char, Int)] -> Vals
-compute input = go 1 (0, 0) (empty) input 
+compute input = go 1 (0, 0) (empty) input
   where go len (x, y) values [] = values
         go len (x, y) values ((_, 0):xs) = go len (x, y) values xs
         go len (x, y) values (('U', n):xs) = go (len+1) (x, y+1) (maybeInsert (x, y+1) len values) (('U', (n-1)):xs)

@@ -1,3 +1,5 @@
+module Day20 where
+
 import Data.Maybe
 import Data.List.Extra
 import Control.Arrow ((&&&))
@@ -59,11 +61,11 @@ portalNeighbours :: Maze -> Int -> Pos -> [(Int, Pos)]
 portalNeighbours maze level pos = matchingPortal maze level pos ++ zip (repeat level) (neighbours pos)
 
 matchingPortal :: Maze -> Int -> Pos -> [(Int, Pos)]
-matchingPortal maze level pos@(x,y) = 
-  case withDef maze pos of 
+matchingPortal maze level pos@(x,y) =
+  case withDef maze pos of
     Portal s -> let next = M.foldrWithKey (\k v acc -> if v == Portal s && k /= pos then k else acc) (0,0) maze
                     (xs, ys) = (map fst &&& map snd) $ M.keys maze
-                    minx = [minimum xs, maximum xs] 
+                    minx = [minimum xs, maximum xs]
                     miny = [minimum ys, maximum ys]
                     level' = if x `elem` minx || y `elem` miny
                                then level - 1
@@ -76,7 +78,7 @@ bfs f maze = go (S.singleton (0, start)) (P.singleton 0 (0, start))
   where
     end = M.foldrWithKey (\k v acc -> if v == Portal "ZZ" then k else acc) (0,0) maze
     start = M.foldrWithKey (\k v acc -> if v == Portal "AA" then k else acc) (0,0) maze
-    go seen queue = 
+    go seen queue =
       let (pri, (level, currentPos)) = P.findMin queue
           new = filter (\x -> not (x `S.member` seen) && (snd x `M.member` maze) && fst x >= 0) $ portalNeighbours maze level currentPos
           queue' = P.deleteMin . foldr (P.insert (pri + 1)) queue $ new

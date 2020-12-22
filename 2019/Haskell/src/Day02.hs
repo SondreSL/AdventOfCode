@@ -1,3 +1,5 @@
+module Day02 where
+
 import Data.List
 import Data.Vector (Vector, (//), (!), fromList)
 import Data.Bool

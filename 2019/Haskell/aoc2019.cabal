@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7bc5ae18408535ef3ff4e045710d00206b27a40bf62db9a5fadfb8b21237502a
+-- hash: e7d6fd6155188af27cd7fd90037c42984220d44f0f8824691ea047a9d1bd4756
 
 name:           aoc2019
 version:        0.1.0.0
@@ -54,8 +54,6 @@ library
       Day25
       Intcode
       Lib
-      Template
-      Utilities
   other-modules:
       Paths_aoc2019
   hs-source-dirs:
@@ -80,9 +78,11 @@ library
     , lens
     , lens-regex-pcre
     , linear
+    , modular
     , mtl
     , parsec
     , pointedlist
+    , pqueue
     , recursion-schemes
     , relude
     , sbv
@@ -118,9 +118,11 @@ executable aoc2019-exe
     , lens
     , lens-regex-pcre
     , linear
+    , modular
     , mtl
     , parsec
     , pointedlist
+    , pqueue
     , recursion-schemes
     , relude
     , sbv
@@ -157,9 +159,11 @@ test-suite aoc2019-test
     , lens
     , lens-regex-pcre
     , linear
+    , modular
     , mtl
     , parsec
     , pointedlist
+    , pqueue
     , recursion-schemes
     , relude
     , sbv

@@ -1,3 +1,4 @@
+module Day01 where
 -- Advent of Code 2019 Day 1
 -- Sondre Lunde
 

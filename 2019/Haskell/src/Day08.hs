@@ -1,6 +1,8 @@
+module Day08 where
+
 import Data.Ord
 import Data.List
-import Data.List.Split (chunksOf)
+import Data.List.Extra (chunksOf)
 
 color :: String -> String -> String
 color "" "" = ""
@@ -13,7 +15,7 @@ solveA w h str = (occ '1' xs) * (occ '2' xs)
         xs = minimumBy (comparing (occ '0')) $ chunksOf (w * h) str
 
 solveB :: Int -> Int -> String -> IO ()
-solveB w h str = 
+solveB w h str =
   let res = foldr1 color $ chunksOf (w * h) str
       f '1' = '🔴'
       f '0' = '🖤'

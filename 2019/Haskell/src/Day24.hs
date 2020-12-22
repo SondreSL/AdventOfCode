@@ -1,3 +1,5 @@
+module Day24 where
+
 import Data.List
 import Data.Maybe
 import Control.Lens
@@ -9,7 +11,7 @@ type Game = M.Map Pos (Int, Bool)
 
 parse :: String -> Game
 parse input = M.fromList . zip coords . zip (map (2^) [0..]) . map (=='#') . concat . lines $ input
-  where ls = lines input 
+  where ls = lines input
         lx = (subtract 1) . length . head $ ls
         ly = (subtract 1) . length $ ls
         coords = concatMap (zip [0..lx] . repeat) $ [0..ly]
@@ -22,14 +24,14 @@ advance game = M.mapWithKey evolve game
   where evolve :: Pos -> (Int, Bool) -> (Int, Bool)
         evolve pos (i, status) = (i, newStat status (livingNeighbours pos))
         livingNeighbours (x,y) = length $ filter (snd . (\x -> M.findWithDefault (0, False) x game)) [(x+1,y),(x-1,y),(x,y+1),(x,y-1)]
-        newStat st v = 
-          case st of 
-            True -> case v of 
-                      1 -> True 
-                      _ -> False 
-            False -> case v of 
-                       1 -> True 
-                       2 -> True 
+        newStat st v =
+          case st of
+            True -> case v of
+                      1 -> True
+                      _ -> False
+            False -> case v of
+                       1 -> True
+                       2 -> True
                        _ -> False
 
 draw :: Game -> IO ()

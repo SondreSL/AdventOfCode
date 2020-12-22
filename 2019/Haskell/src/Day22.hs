@@ -1,7 +1,5 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE RankNTypes #-}
+module Day22 where
+
 import Data.Finite
 import Data.Group
 import Data.Monoid

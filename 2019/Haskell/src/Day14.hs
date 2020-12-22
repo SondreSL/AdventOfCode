@@ -1,3 +1,5 @@
+module Day14 where
+
 import Data.Maybe
 import Data.Bifunctor
 import Data.List.Extra
@@ -7,7 +9,7 @@ import qualified Data.Map.Strict as M
 import Debug.Trace
 
 type Name = String
-type Minimum = Int 
+type Minimum = Int
 type Excess = M.Map Name Int
 type Produced = Int
 type Data = M.Map Name Chemical
@@ -15,7 +17,7 @@ data Chemical = Chemical Name Minimum [(Name, Int)]
   deriving Show
 
 parseLine :: String -> (Name, Chemical)
-parseLine line = 
+parseLine line =
   let [instr, chem] = splitOn " => " line
       [chemNum, chemName] = splitOn " " chem
       parts = map toTup . map (splitOn " ") $ splitOn ", " instr
@@ -43,18 +45,18 @@ solveA :: Data -> Int
 solveA input = M.findWithDefault 0 "ORE" . produce input M.empty $ ("FUEL", 1)
 
 solveB :: Data -> Int -> Int -> Int
-solveB input start target = 
+solveB input start target =
   let exc = produce input M.empty $ ("FUEL", start)
       new = M.findWithDefault 0 "ORE" exc
       inner exc inp = produce input exc inp
    in M.findWithDefault 0 "ORE" . last . takeWhile ((< target) . M.findWithDefault 0 "ORE") . scanl inner exc $ repeat ("FUEL", 1)
 
 -- solveB :: Data -> Int -> Int -> Int
--- solveB input n target = 
+-- solveB input n target =
 --   let x1 = 1000
 --       x2 = 10000
---       y1 = 466335870      
---       y2 = 4662685411      
+--       y1 = 466335870
+--       y2 = 4662685411
 --       slope = (y2 - y1) `div` (x2 - x1)
 --       b = y1 - slope * x1
 --    in (target - b) `div` slope

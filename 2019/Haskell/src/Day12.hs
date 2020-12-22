@@ -1,3 +1,5 @@
+module Day12 where
+
 import Data.List
 import qualified Data.Set as S
 import Data.Tuple.Extra
@@ -6,26 +8,26 @@ import Debug.Trace
 
 type Pos = [Integer]
 type Vel = [Integer]
-type Moon = (Pos, Vel) 
- 
+type Moon = (Pos, Vel)
+
 initialize :: [Pos] -> [Moon]
 initialize = map (flip (,) [0,0,0])
 
 step :: [Moon] -> [Moon]
-step moons = 
-  let updateCoords (coords, vel) = (zipWith (+) coords vel, vel) 
+step moons =
+  let updateCoords (coords, vel) = (zipWith (+) coords vel, vel)
    in map updateCoords $ (map =<< newVelocity) moons
 
 newVelocity :: [Moon] -> Moon -> Moon
-newVelocity xs (we, sp) = 
+newVelocity xs (we, sp) =
   let moons = map fst xs
       diff = map sum . transpose $ map (zipWith gravity we) moons
    in (we, zipWith (+) sp diff)
 
 gravity :: Integer -> Integer -> Integer
-gravity a b 
-  | a < b = 1 
-  | a > b = (-1) 
+gravity a b
+  | a < b = 1
+  | a > b = (-1)
   | a == b = 0
 
 compVar :: Int -> Moon -> Moon -> Bool
@@ -37,7 +39,7 @@ findFirst set (x:xs)
   | otherwise = findFirst (S.insert x set) xs
 
 period :: [Moon] -> Integer -> Integer
-period moons n = 
+period moons n =
   let moon = moons !! (fromInteger n)
       matchingStates co = co moon . (!! (fromInteger n)) . snd
       ixs co = findFirst S.empty . map fst . filter (matchingStates co) . zip [1..] . iterate step . step $ moons
@@ -51,7 +53,7 @@ solveA = sum . map energy . last . take 1000 . iterate step . step
   where energy moon = uncurry (*) . both (sum . map abs) $ moon
 
 solveB :: [Moon] -> Integer
-solveB moons = 
+solveB moons =
   let a = map (period moons) $ [0..3]
    in foldr1 lcm a
 
