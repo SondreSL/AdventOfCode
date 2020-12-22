@@ -1,41 +1,51 @@
 module Day21 where
 
-import Lib
 import Intcode
-import Control.Lens
-import Data.List.Extra
-import Data.Char
+    ( Intcode(Intcode), ProgramState(Wait), untilHalt, parseIntcode )
+import Data.Char ( chr )
+import           Data.Map   ( Map )
 
+part1 :: Map Int Int -> [Int]
 part1 input = untilHalt (Wait ic)
   where
     ic = Intcode 0 0 rules [] input
     rules = unlines
-      [ "NOT A J"
-      , "NOT D T"
-      , "NOT T T"
+      [ "NOT B J"  -- Hole at B
+      , "NOT C T"  --   or hole at C
+      , "OR T J"
+      , "AND D J"  -- ground at D
+      , "NOT A T"  -- hole at A
       , "OR T J"
       , "WALK"
       , "\n"
       ]
 
-part2 input = undefined
-
-jumpIntoHole :: String
-jumpIntoHole = "NOT D J\nWALK\n\n"
+part2 :: Map Int Int -> [Int]
+part2 input = untilHalt (Wait ic)
+  where
+    ic = Intcode 0 0 rules [] input
+    rules = unlines
+      [ "NOT B J"  -- Hole at B
+      , "NOT C T"  --   or hole at C
+      , "OR T J"
+      , "AND D J"  -- Ground at D
+      , "AND H J"  -- Ground at H
+      , "NOT A T"  -- Hole at A
+      , "OR T J"
+      , "RUN"
+      , "\n"
+      ]
 
 drawRobot :: [Int] -> IO ()
-drawRobot xs = putStrLn (map chr (init xs)) >> print (last xs)
+drawRobot xs = putStrLn (map chr (init xs))
+               >> putStr "Score: "
+               >> print (last xs)
+               >> putStrLn "\n"
 
 main :: IO ()
 main = do
   input <- parseIntcode <$> readFile "../data/input-2019-21.txt"
   drawRobot $ part1 input
-  -- print $ part1 input
-  -- print $ part2 input
+  drawRobot $ part2 input
 
--- If A is hole
---   -> Jump
--- Else
---   If D is not not hole
---     Jmp
-
+-- 19348404
