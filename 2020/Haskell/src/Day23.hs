@@ -20,7 +20,7 @@ play m n current mp =
         | val == first || val == second || val == third = findDest (val - 1)
         | otherwise = val
       mp' = Map.insert current (mp Map.! third) mp
-          & Map.insert third (mp' Map.! dest)
+          & Map.insert third (mp Map.! dest)
           & Map.insert dest first
    in play m (n - 1) (mp' Map.! current) mp'
 
