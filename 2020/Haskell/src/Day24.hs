@@ -28,10 +28,9 @@ move W = (+ V3 (-1) 1 0)
 move NW = (+ V3 0 1 (-1))
 
 flipHexes :: [[Dir]] -> Set Hex
-flipHexes = go
+flipHexes = foldl f Set.empty
   where
     locatePoint = foldl (flip move) (V3 0 0 0)
-    go = foldl f Set.empty
     f seen (locatePoint -> p) =
         if Set.member p seen
             then Set.delete p seen
