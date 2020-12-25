@@ -63,6 +63,7 @@ default-extensions:
 - TypeApplications
 - ViewPatterns
 - RecordWildCards
+- MultiWayIf
   # - OverloadedStrings
 
 library:
