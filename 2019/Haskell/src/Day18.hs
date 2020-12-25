@@ -1,192 +1,135 @@
 module Day18 where
 
-import Data.List
-import Data.Char
-import Data.Maybe
+import Linear
 import Control.Lens
-import Data.Bifunctor
-import qualified Data.Set as S
-import qualified Data.PQueue.Prio.Min as P
-import qualified Data.Map.Strict as M
+import Data.Char
+import Data.List.Extra
+import Data.Map (Map)
+import qualified Data.Map as Map
+import Lib
+import qualified Data.Set as Set
+import           Data.Set   ( Set )
+import Control.Monad.State
+import Data.Maybe
+import qualified Data.PQueue.Prio.Min as PQ
+import Data.PQueue.Prio.Min ( MinPQueue )
 
-import Debug.Trace
+data Tile
+    = Door Char
+    | Key Char
+    | Entrance
+    | Floor
+    deriving (Show, Eq, Ord)
+makePrisms ''Tile
 
--- Definitions
-data Object = Key Char
-            | Door Char
-            | Path
-            | Player
-            | Wall
-            deriving (Eq, Show)
+tileChar :: Tile -> Char
+tileChar (Key c) = c
+tileChar (Door c) = c
+tileChar _ = error "No char here"
 
-type Pos = (Int, Int)
-type Labyrinth = M.Map Pos Object
-type Dists = M.Map Pos Int
-type Cache = M.Map (Pos, Pos) Int
-type Seen = S.Set Pos
+type Input = Map Point Tile
+type Lab = Map Point [(Int, Point)]
+type ExpState = (Input, Lab, Set Char, Set (Set Point, Set Char))
 
-wall :: Object -> Bool
-wall Wall = True
-wall _ = False
+data Explorer = Explorer
+    { _position :: [Point]
+    , _keys :: Set Char
+    }
+    deriving (Show, Eq, Ord)
+makeLenses ''Explorer
 
-isKey :: Object -> Bool
-isKey (Key _) = True
-isKey _ = False
+-- Tuple of length of current trip and explorer
+type Position = (Int, Explorer)
 
-isKeyPlayer :: Object -> Bool
-isKeyPlayer (Key _) = True
-isKeyPlayer Player = True
-isKeyPlayer _ = False
+changeOrder :: Explorer -> [Explorer]
+changeOrder (Explorer ps ks) =
+  case ps of
+    [_] -> [Explorer ps ks]
+    [a,b,c,d] -> [ Explorer [a,b,c,d] ks
+                 , Explorer [b,c,d,a] ks
+                 , Explorer [c,d,a,b] ks
+                 , Explorer [d,a,b,c] ks
+                 ]
+    n -> error $ show n
 
-value :: Object -> Char
-value (Key v) = v
-value (Door v) = v
+bfs :: Explorer -> State ExpState [(Int, Explorer)]
+bfs (Explorer (pos:ps) keys) = do
+  (coords, interests, _, seen) <- get
+  let int = Map.findWithDefault [] pos interests
+      nbs = filter (\(_, Explorer p ks) -> (Set.fromList p, ks) `Set.notMember` seen)
+            . mapMaybe (\(i, x) -> f (i, x, x `Map.lookup` coords))
+            $ int
+      f (_, _, Nothing) = Nothing
+      f (i, p, Just Entrance) = Just (i, Explorer (p:ps) keys)
+      f (i, p, Just Floor) = Just (i, Explorer (p:ps) keys)
+      f (i, p, Just (Key c)) = Just (i, Explorer (p:ps) (Set.insert c keys)) -- Maybe keep going
+      f (i, p, Just (Door c)) = guard (Set.member (toLower c) keys) >> Just (i, Explorer (p:ps) keys)
+  pure nbs
 
--- Parsing and drawing
-parseLab :: String -> Labyrinth
-parseLab input =
-  let ls = lines input
-      maxY = length ls
-      maxX = (subtract 1) . length . head $ ls
-      coords = concatMap (zip [0..maxX] . repeat) [0..maxY]
-      object o
-        | o == '.' = Path
-        | o == '#' = Wall
-        | o == '@' = Player
-        | isAlpha o && isLower o = Key o
-        | isAlpha o && isUpper o = Door o
-   in M.fromList . filter ((/=Wall) . snd) . map (second object) . zip coords $ concat ls
+explore :: MinPQueue Int Explorer -> State ExpState (Maybe (Int, Explorer))
+explore queue = do
+  (_, _, keys, seen) <- get
+  ((st, exp), queue') <- maybe (error "No explorers left") pure (PQ.minViewWithKey queue)
+  exps' <- traverse bfs $ changeOrder exp
+  let exps = Set.fromList $ concat exps'
+  if | _keys exp == keys -> pure $ Just (st, exp)
+     | null exps -> explore queue'
+     | otherwise -> do
+       modify $ set _4 (Set.union seen (Set.map ((\(Explorer ps ks) -> (Set.fromList ps, ks)) . snd) exps))
+       explore (foldr (\(i, e) acc -> PQ.insert (i + st) e acc) queue' exps)
 
--- Logic
-data Point = K { _name  :: Char
-             , _pos   :: Pos
-             , _dist  :: Int
-             , _doors :: S.Set Char
-             }
-               | P Pos
-             deriving Show
-
-data Explorer = E { _len       :: Int
-                  , _keysFound :: S.Set Char
-                  , _node      :: Point
-                  }
-                  deriving Show
-
-nbs :: Labyrinth -> Seen -> Pos -> [Pos]
-nbs lab seen (x,y) = filter notSeen . filter notWall $ [(x+1,y), (x-1,y), (x,y+1), (x,y-1)]
-  where notWall p = not . wall $ M.findWithDefault Wall p lab
-        notSeen x = not $ S.member x seen
-
-bfs :: Labyrinth -> Pos -> M.Map Char Point
-bfs lab initPos = go initialSeen initialQueue M.empty
+run :: Input -> Maybe Int
+run input = fst <$> evalState (explore (PQ.singleton 0 initial)) (input, interests, keys, Set.empty)
   where
-    initialQueue = foldr (P.insert 1) P.empty $ zip (nbs lab (S.singleton initPos) initPos) (repeat S.empty)
-    initialSeen = foldr S.insert (S.singleton initPos) $ nbs lab S.empty initPos
-    go seen queue res =
-      case P.getMin queue of
-        Nothing -> res
-        Just (n, (pos, drs)) ->
-          let neighbours = nbs lab seen pos
-              val = M.findWithDefault Path pos lab
-              (drs', res') = case val of
-                       Path   -> (drs, res)
-                       Door v -> (S.insert v drs, res)
-                       Key v  -> (drs, M.insert v (K v pos n drs) res)
-                       Player -> (drs, res)
-              queue' = P.deleteMin $ foldr (P.insert (n + 1)) queue (zip neighbours (repeat drs'))
-           in go (foldr S.insert seen neighbours) queue' res'
+    interests = mkGraph input
+    initial = Explorer entrance Set.empty
+    entrance = fmap fst . filter ((== Entrance) . snd) $ Map.toList input
+    keys = Set.fromList . map tileChar . Map.elems $ Map.filter (has _Key) input
 
-startPos :: Labyrinth -> Pos
-startPos = M.foldrWithKey (\k v acc -> if v == Player then k else acc) (0,0)
-
-initialize :: Labyrinth -> M.Map Char (M.Map Char Point)
-initialize lab = M.fromList . map (\(pos, Key v) -> (v, bfs lab pos)) . M.toList $ M.filter isKey lab
-
--- | Make the initial queue for a labyrinth
-mkQueue :: Labyrinth -> P.MinPQueue Int Explorer
-mkQueue lab = P.filter isSubsetOf . foldr (uncurry P.insert) P.empty $ map toExplorer initialDists
-  where
-    initialDists = M.toList $ bfs lab (startPos lab)
-    toExplorer (ch, key) = (_dist key, E (_dist key) S.empty key)
-    isSubsetOf (E _ keysSeen (K _ _ _ drs)) = drs `S.isSubsetOf` keysSeen
-
-findNextPath :: M.Map Char (M.Map Char Point) -> Char -> S.Set Char -> [Point]
-findNextPath dists name seen = map snd . M.toList . M.filter f $ M.findWithDefault M.empty name dists
-  where
-    f (K n pos d dr) = not (toUpper n `S.member` seen) && dr `S.isSubsetOf` seen
-
-path :: Labyrinth -> Int
-path lab = go (mkQueue lab) (initialize lab) S.empty
-  where
-    go pq dists seen =
-      let (pri, (E len keysSeen k@(K name pos dist drs))) = P.findMin pq -- Cannot fail
-          keysSeen' = S.insert (toUpper name) keysSeen
-          cands = findNextPath dists name keysSeen'
-          nextExp newK@(K n p d ds) = (len + d, E (len + d) keysSeen' newK)
-          pq' = foldr (uncurry P.insert) (P.deleteMin pq) $ map nextExp cands
-       in case S.member (name, keysSeen') seen of
-            False -> case cands of
-                       [] -> pri -- Finished
-                       _ -> go pq' dists (S.insert (name, keysSeen') seen)
-            True -> go (P.deleteMin pq) dists seen
-
--- For multiple labyrinths
-startPositions :: Labyrinth -> [Pos]
-startPositions = M.foldrWithKey (\k v acc -> if v == Player then k:acc else acc) []
-
-bfsPos :: Labyrinth -> Pos -> M.Map Pos Point
-bfsPos lab initPos = go initialSeen initialQueue M.empty
-  where
-    initialQueue = foldr (P.insert 1) P.empty $ zip (nbs lab (S.singleton initPos) initPos) (repeat S.empty)
-    initialSeen = foldr S.insert (S.singleton initPos) $ nbs lab S.empty initPos
-    go seen queue res =
-      case P.getMin queue of
-        Nothing -> res
-        Just (n, (pos, drs)) ->
-          let neighbours = nbs lab seen pos
-              val = M.findWithDefault Path pos lab
-              (drs', res') = case val of
-                       Path   -> (drs, res)
-                       Door v -> (S.insert v drs, res)
-                       Key v  -> (drs, M.insert pos (K v pos n drs) res)
-                       Player -> (drs, M.insert pos (P pos) res)
-              queue' = P.deleteMin $ foldr (P.insert (n + 1)) queue (zip neighbours (repeat drs'))
-           in go (foldr S.insert seen neighbours) queue' res'
-
--- mkQueue4 :: Labyrinth -> P.MinPQueue Int Explorer
--- mkQueue4 lab = P.fromList
---   where
---     intitial = startPositions lab
-
-initializePos :: Labyrinth -> M.Map Pos (M.Map Pos Point)
-initializePos lab = M.fromList . map (\(pos, v) -> (pos, bfsPos lab pos)) . M.toList $ M.filter isKeyPlayer lab
-
-path4 :: Labyrinth -> Int
-path4 lab = undefined
-
-solveA :: Labyrinth -> Int
-solveA = path
-
-solveB :: undefined
-solveB = undefined
-
+main :: IO ()
 main = do
-  lab <- parseLab <$> readFile "data/input-2019-18.txt"
-  -- print $ solveA lab
+    input <- parseInput <$> readFile "../data/input-2019-18.txt"
+    print $ run input                 -- 6316
+    print $ run $ alteredLab input    -- 1648
 
+-- Various functions for changing the graph
+alteredLab :: Map Point Tile -> Map Point Tile
+alteredLab input =
+  let Just ent = fmap fst . find ((== Entrance) . snd) $ Map.toList input
+      nbs = ent : neighbours ent
+   in foldl (flip Map.delete) input nbs
+       & Map.insert (ent + V2 1 1) Entrance
+       & Map.insert (ent + V2 (-1) (-1)) Entrance
+       & Map.insert (ent + V2 1 (-1)) Entrance
+       & Map.insert (ent + V2 (-1) 1) Entrance
 
-  lab2 <- parseLab <$> readFile "test2.in"
-  print $ startPositions lab2
-  mapM_ print $ initializePos lab2
-  -- mapM_ print $ map (bfsPos lab2) (startPositions lab2)
+mkGraph :: Map Point Tile -> Map Point [(Int, Point)]
+mkGraph mp = Map.mapWithKey findNext interest
+  where
+    interest = Map.filter (\x -> has _Key x || has _Door x || has _Entrance x) mp
+    findNext :: Point -> Tile -> [(Int, Point)]
+    findNext pos _ = go (Set.singleton pos) (foldr (PQ.insert 1) PQ.empty (neighbours4 pos))
+    go seen queue
+      | PQ.null queue = []
+      | otherwise = let Just ((i,next), queue') = PQ.minViewWithKey queue
+                        nbs = filter (`Set.notMember` seen) $ neighbours4 next
+                        seen' = Set.union seen (Set.fromList nbs)
+                        queue'' = foldr (PQ.insert (i + 1)) queue' nbs
+                     in case Map.lookup next mp of
+                          Just (Key _) -> (i, next) : go seen queue'
+                          Just (Door _) -> (i, next) : go seen queue'
+                          Just Entrance -> go seen' queue''
+                          Just Floor -> go seen' queue''
+                          Nothing -> go seen queue'
 
-  -- lab3 <- parseLab <$> readFile "test3.in"
-  -- print $ solveA lab3
-
-  -- lab1 <- parseLab <$> readFile "test1.in"
-  -- print $ solveA lab1
-  -- lab <- parseLab <$> readFile "data/input-2019-18-2.txt"
-  -- print $ solveB lab
-
-
--- 6316
+-- Parsing
+parseInput :: String -> Map Point Tile
+parseInput = parseAsciiMap f
+  where
+    f '.' = Just Floor
+    f '@' = Just Entrance
+    f '#' = Nothing
+    f c
+        | isLower c = Just (Key c)
+        | isUpper c = Just (Door c)
+        | otherwise = error $ show c
