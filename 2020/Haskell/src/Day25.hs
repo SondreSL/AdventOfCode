@@ -1,14 +1,13 @@
 module Day25 where
 
 import Data.Finite (Finite, finite, getFinite)
-import Data.Function (fix)
 import Data.List.Extra (elemIndex)
 import Lib (tuple)
 
 part1 :: Finite 20201227 -> Finite 20201227 -> Maybe Integer
 part1 card door = getFinite . (card ^) <$> doorIx
   where
-    doorIx = elemIndex door (1 : fix (map (* 7) . (1 :)))
+    doorIx = elemIndex door $ iterate (*7) 1
 
 main :: IO ()
 main = do
