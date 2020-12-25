@@ -46,6 +46,8 @@ dependencies:
 - foldl
 - comonad
 - arithmoi
+- modular
+- finite-typelits
 
 default-extensions:
 - BangPatterns
