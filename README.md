@@ -7,8 +7,8 @@ This was created after solving many problems, files have been moved around, and 
 
 Stats:
 
-- [2020: Ongoing](2020)
-- [2019: 47/50](2019)
+- [2020: 50/50](2020)
+- [2019: 50/50](2019)
 - [2018: 50/50](2018)
 - [2017: 50/50](2017)
 - [2016: 50/50](2016)
