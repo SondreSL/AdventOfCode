@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e7d6fd6155188af27cd7fd90037c42984220d44f0f8824691ea047a9d1bd4756
+-- hash: 1a0c26c365e8d03e863b823f1fc8ead9ff7c4e3443c032e56576e9c03103dcc9
 
 name:           aoc2019
 version:        0.1.0.0
@@ -58,7 +58,7 @@ library
       Paths_aoc2019
   hs-source-dirs:
       src
-  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor DeriveTraversable DeriveFoldable TemplateHaskell RankNTypes DataKinds QuasiQuotes TypeApplications ViewPatterns RecordWildCards
+  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor DeriveTraversable DeriveFoldable TemplateHaskell RankNTypes DataKinds QuasiQuotes TypeApplications ViewPatterns RecordWildCards MultiWayIf
   build-depends:
       MissingH
     , arithmoi
@@ -96,7 +96,7 @@ executable aoc2019-exe
       Paths_aoc2019
   hs-source-dirs:
       app
-  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor DeriveTraversable DeriveFoldable TemplateHaskell RankNTypes DataKinds QuasiQuotes TypeApplications ViewPatterns RecordWildCards
+  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor DeriveTraversable DeriveFoldable TemplateHaskell RankNTypes DataKinds QuasiQuotes TypeApplications ViewPatterns RecordWildCards MultiWayIf
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       MissingH
@@ -137,7 +137,7 @@ test-suite aoc2019-test
       Paths_aoc2019
   hs-source-dirs:
       test
-  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor DeriveTraversable DeriveFoldable TemplateHaskell RankNTypes DataKinds QuasiQuotes TypeApplications ViewPatterns RecordWildCards
+  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor DeriveTraversable DeriveFoldable TemplateHaskell RankNTypes DataKinds QuasiQuotes TypeApplications ViewPatterns RecordWildCards MultiWayIf
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       MissingH

@@ -20,13 +20,13 @@ import qualified Day09
 -- import qualified Day15
 -- import qualified Day16
 import qualified Day17
--- import qualified Day18
+import qualified Day18
 -- import qualified Day19
 -- import qualified Day20
 import qualified Day21
 -- import qualified Day22
 -- import qualified Day23
--- import qualified Day24
+import qualified Day24
 import qualified Day25
 
 run :: [Char] -> IO b -> IO b
@@ -48,7 +48,7 @@ main = do
   -- run "12" Day12.main
   -- run "13" Day13.main
   -- run "14" Day14.main
-  -- run "15" Day15.main
+  run "15" Day15.main
   -- run "16" Day16.main
   -- run "17" Day17.main
   -- run "18" Day18.main
@@ -58,5 +58,4 @@ main = do
   -- run "22" Day22.main
   -- run "23" Day23.main
   -- run "24" Day24.main
-  run "25" Day25.main
-
+  -- run "25" Day25.main
