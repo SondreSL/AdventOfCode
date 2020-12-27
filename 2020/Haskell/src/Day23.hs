@@ -1,41 +1,51 @@
 module Day23 where
 
-import Data.Digits
-import qualified Data.IntMap.Strict as Map
-import           Data.IntMap.Strict   ( IntMap )
-import Data.Function ((&))
+import Data.Digits ( digits, unDigits )
+import Control.Monad.ST (runST)
+import qualified Data.Vector.Unboxed.Mutable as MV
+import Control.Monad (forM_)
+import qualified Data.Vector.Unboxed as V
 
 -- A port of Sarek's solution
 -- https://github.com/sarsko/aoc-2020/blob/main/src/day23.rs
---
-play :: Int -> Int -> Int -> IntMap Int -> IntMap Int
-play _ 0 _ mp = mp
-play m n current mp =
-  let first = mp Map.! current
-      second = mp Map.! first
-      third = mp Map.! second
-      dest = findDest (current - 1)
-      findDest val
-        | val == 0 = findDest m
-        | val == first || val == second || val == third = findDest (val - 1)
-        | otherwise = val
-      mp' = Map.insert current (mp Map.! third) mp
-          & Map.insert third (mp Map.! dest)
-          & Map.insert dest first
-   in play m (n - 1) (mp' Map.! current) mp'
+play :: Int -> Int -> Int -> [(Int, Int)] -> V.Vector Int
+play m n current mp = runST $ do
+  vec <- MV.replicate (m + 1) 0
+
+  forM_ mp $ \(i, v) -> do
+    MV.write vec i v
+
+  let run current turn
+        | turn == n = V.freeze vec
+        | otherwise = do
+            first <- MV.read vec current
+            second <- MV.read vec first
+            third <- MV.read vec second
+            let findDest val
+                  | val == 0 = findDest m
+                  | val == first || val == second || val == third = findDest (val - 1)
+                  | otherwise = val
+                dest = findDest (current - 1)
+            MV.read vec third >>= MV.write vec current
+            MV.read vec dest >>= MV.write vec third
+            MV.write vec dest first
+            current' <- MV.read vec current
+            run current' (succ turn)
+
+  run current 0
 
 part1 :: [Int] -> Int
 part1 xs = unDigits 10 $ take 8 (go 1)
-  where mp = play 9 100 (head xs) $ Map.fromList $ (zip <*> tail) xs
-        go n = let v = mp Map.! n
+  where mp = play 9 100 (head xs) $ (zip <*> tail) xs
+        go n = let v = mp V.! n
                 in v : go v
 
 part2 :: [Int] -> Int
-part2 xs = let one = mp Map.! 1
-               two = mp Map.! one
+part2 xs = let one = mp V.! 1
+               two = mp V.! one
             in one * two
   where
-    mp = play 1000000 10000000 (head xs) $ Map.fromList $ (zip <*> tail) xs
+    mp = play 1000000 10000000 (head xs) $ (zip <*> tail) xs
 
 main :: IO ()
 main = do
